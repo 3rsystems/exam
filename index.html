@@ -3,783 +3,209 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Exam System · Cloud Links</title>
+    <title>Exam System · Live Responses + Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-        }
-        body {
-            background: #f0f4f9;
-            min-height: 100vh;
-            padding: 2rem 1rem;
-            display: flex;
-            justify-content: center;
-        }
-        .app {
-            max-width: 1200px;
-            width: 100%;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background: #f0f4f9; min-height: 100vh; padding: 2rem 1rem; display: flex; justify-content: center; }
+        .app { max-width: 1200px; width: 100%; }
         .header {
-            background: white;
-            padding: 1.5rem 2rem;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            margin-bottom: 2rem;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
+            background: white; padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 2rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;
         }
-        .header h1 {
-            font-weight: 600;
-            font-size: 1.7rem;
-            color: #0b1e33;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-        .header h1 i {
-            color: #0b57d0;
-        }
-        .header-actions {
-            display: flex;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+        .header h1 { font-weight: 600; font-size: 1.7rem; color: #0b1e33; display: flex; align-items: center; gap: 0.6rem; }
+        .header h1 i { color: #0b57d0; }
+        .header-actions { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
         .btn {
-            background: white;
-            border: 1px solid #dadce0;
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
-            font-weight: 500;
-            color: #1e293b;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            background: #f8fafc;
+            background: white; border: 1px solid #dadce0; padding: 0.6rem 1.2rem; border-radius: 30px;
+            font-weight: 500; color: #1e293b; cursor: pointer; transition: 0.2s;
+            display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; background: #f8fafc;
             text-decoration: none;
         }
-        .btn-primary {
-            background: #0b57d0;
-            border-color: #0b57d0;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #0b4cb0;
-        }
-        .btn-success {
-            background: #0f7b3a;
-            border-color: #0f7b3a;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #0d6a31;
-        }
-        .btn-danger {
-            background: #d93025;
-            border-color: #d93025;
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #c6281e;
-        }
-        .btn-outline {
-            background: transparent;
-        }
-        .btn-outline:hover {
-            background: #e8edf4;
-        }
-        .btn-sm {
-            padding: 0.3rem 1rem;
-            font-size: 0.8rem;
-        }
-        .btn-exam {
-            background: #1a73e8;
-            border-color: #1a73e8;
-            color: white;
-        }
-        .btn-exam:hover {
-            background: #1557b0;
-        }
-        .btn-gold {
-            background: #e37400;
-            border-color: #e37400;
-            color: white;
-        }
-        .btn-gold:hover {
-            background: #cc6600;
-        }
-        .btn-purple {
-            background: #7c3aed;
-            border-color: #7c3aed;
-            color: white;
-        }
-        .btn-purple:hover {
-            background: #6d28d9;
-        }
-        .btn-cyan {
-            background: #0891b2;
-            border-color: #0891b2;
-            color: white;
-        }
-        .btn-cyan:hover {
-            background: #0e7490;
-        }
-        .btn-teal {
-            background: #0d9488;
-            border-color: #0d9488;
-            color: white;
-        }
-        .btn-teal:hover {
-            background: #0f766e;
-        }
+        .btn-primary { background: #0b57d0; border-color: #0b57d0; color: white; }
+        .btn-primary:hover { background: #0b4cb0; }
+        .btn-success { background: #0f7b3a; border-color: #0f7b3a; color: white; }
+        .btn-success:hover { background: #0d6a31; }
+        .btn-danger { background: #d93025; border-color: #d93025; color: white; }
+        .btn-danger:hover { background: #c6281e; }
+        .btn-outline { background: transparent; }
+        .btn-outline:hover { background: #e8edf4; }
+        .btn-sm { padding: 0.3rem 1rem; font-size: 0.8rem; }
+        .btn-exam { background: #1a73e8; border-color: #1a73e8; color: white; }
+        .btn-exam:hover { background: #1557b0; }
+        .btn-gold { background: #e37400; border-color: #e37400; color: white; }
+        .btn-gold:hover { background: #cc6600; }
+        .btn-purple { background: #7c3aed; border-color: #7c3aed; color: white; }
+        .btn-purple:hover { background: #6d28d9; }
+        .btn-teal { background: #0d9488; border-color: #0d9488; color: white; }
+        .btn-teal:hover { background: #0f766e; }
+        .btn-pink { background: #db2777; border-color: #db2777; color: white; }
+        .btn-pink:hover { background: #be185d; }
 
-        .view-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
+        .view-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
         .view-tab {
-            background: white;
-            padding: 0.7rem 1.5rem;
-            border-radius: 40px;
-            border: 1px solid #dadce0;
-            cursor: pointer;
-            font-weight: 500;
-            color: #1e293b;
-            transition: 0.1s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            background: white; padding: 0.7rem 1.5rem; border-radius: 40px; border: 1px solid #dadce0;
+            cursor: pointer; font-weight: 500; color: #1e293b; transition: 0.1s;
+            display: inline-flex; align-items: center; gap: 8px;
         }
-        .view-tab.active {
-            background: #0b57d0;
-            border-color: #0b57d0;
-            color: white;
-        }
-        .view-tab .badge {
-            background: #eef3fc;
-            color: #0b57d0;
-            padding: 0 8px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-        .view-tab.active .badge {
-            background: rgba(255, 255, 255, 0.25);
-            color: white;
-        }
+        .view-tab.active { background: #0b57d0; border-color: #0b57d0; color: white; }
+        .view-tab .badge { background: #eef3fc; color: #0b57d0; padding: 0 8px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; }
+        .view-tab.active .badge { background: rgba(255,255,255,0.25); color: white; }
 
         .passcode-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(6px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+            display: flex; align-items: center; justify-content: center; z-index: 99999;
             padding: 1rem;
         }
         .passcode-box {
-            background: white;
-            border-radius: 24px;
-            padding: 2.5rem;
-            max-width: 420px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            text-align: center;
+            background: white; border-radius: 24px; padding: 2.5rem; max-width: 420px; width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
         }
-        .passcode-box i {
-            font-size: 3rem;
-            color: #0b57d0;
-            margin-bottom: 1rem;
-        }
-        .passcode-box h2 {
-            margin-bottom: 0.5rem;
-            color: #0b1e33;
-        }
-        .passcode-box p {
-            color: #5f6368;
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
-        }
+        .passcode-box i { font-size: 3rem; color: #0b57d0; margin-bottom: 1rem; }
+        .passcode-box h2 { margin-bottom: 0.5rem; color: #0b1e33; }
+        .passcode-box p { color: #5f6368; margin-bottom: 1.5rem; font-size: 0.95rem; }
         .passcode-box input {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 2px solid #dadce0;
-            border-radius: 12px;
-            font-size: 1.2rem;
-            text-align: center;
-            letter-spacing: 4px;
-            transition: 0.2s;
+            width: 100%; padding: 0.8rem 1rem; border: 2px solid #dadce0; border-radius: 12px;
+            font-size: 1.2rem; text-align: center; letter-spacing: 4px; transition: 0.2s;
         }
-        .passcode-box input:focus {
-            outline: none;
-            border-color: #0b57d0;
-        }
-        .passcode-box .error {
-            color: #d93025;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-            min-height: 1.5rem;
-        }
-        .passcode-box .btn {
-            margin-top: 1rem;
-            width: 100%;
-            justify-content: center;
-            padding: 0.8rem;
-        }
+        .passcode-box input:focus { outline: none; border-color: #0b57d0; }
+        .passcode-box .error { color: #d93025; font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.5rem; }
+        .passcode-box .btn { margin-top: 1rem; width: 100%; justify-content: center; padding: 0.8rem; }
 
-        .exam-tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            align-items: center;
-        }
+        .exam-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; align-items: center; }
         .exam-tab {
-            background: white;
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
-            border: 1px solid #dadce0;
-            cursor: pointer;
-            font-weight: 500;
-            color: #1e293b;
-            transition: 0.1s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            background: white; padding: 0.5rem 1.2rem; border-radius: 40px; border: 1px solid #dadce0;
+            cursor: pointer; font-weight: 500; color: #1e293b; transition: 0.1s;
+            display: inline-flex; align-items: center; gap: 8px;
         }
-        .exam-tab.active {
-            background: #0b57d0;
-            border-color: #0b57d0;
-            color: white;
-        }
-        .exam-tab .badge {
-            background: #eef3fc;
-            color: #0b57d0;
-            padding: 0 8px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-        .exam-tab.active .badge {
-            background: rgba(255, 255, 255, 0.25);
-            color: white;
-        }
-        .add-exam-btn {
-            margin-left: auto;
-        }
+        .exam-tab.active { background: #0b57d0; border-color: #0b57d0; color: white; }
+        .exam-tab .badge { background: #eef3fc; color: #0b57d0; padding: 0 8px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; }
+        .exam-tab.active .badge { background: rgba(255,255,255,0.25); color: white; }
+        .add-exam-btn { margin-left: auto; }
 
         .timer-row {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 1rem;
-            background: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 40px;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+            display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            background: white; padding: 0.8rem 1.5rem; border-radius: 40px; margin-bottom: 1.5rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
         }
-        .timer-row label {
-            font-weight: 500;
-            color: #1e293b;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .timer-row input {
-            padding: 0.4rem 0.8rem;
-            border: 1px solid #dadce0;
-            border-radius: 30px;
-            width: 100px;
-            font-size: 1rem;
-        }
-        .timer-row input:focus {
-            outline: 2px solid #0b57d0;
-            outline-offset: 1px;
-            border-color: transparent;
-        }
+        .timer-row label { font-weight: 500; color: #1e293b; display: flex; align-items: center; gap: 0.5rem; }
+        .timer-row input { padding: 0.4rem 0.8rem; border: 1px solid #dadce0; border-radius: 30px; width: 100px; font-size: 1rem; }
+        .timer-row input:focus { outline: 2px solid #0b57d0; outline-offset: 1px; border-color: transparent; }
 
         .save-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 0.3rem 1rem;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 500;
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0.3rem 1rem; border-radius: 30px; font-size: 0.8rem; font-weight: 500;
         }
-        .save-indicator.saved {
-            background: #e6f4ea;
-            color: #0f7b3a;
-        }
-        .save-indicator.saving {
-            background: #fef7e0;
-            color: #e37400;
-        }
+        .save-indicator.saved { background: #e6f4ea; color: #0f7b3a; }
+        .save-indicator.saving { background: #fef7e0; color: #e37400; }
 
         .question-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            padding: 1.5rem 2rem;
-            margin-bottom: 1.5rem;
-            border-left: 6px solid #0b57d0;
+            background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            padding: 1.5rem 2rem; margin-bottom: 1.5rem; border-left: 6px solid #0b57d0;
         }
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-bottom: 0.8rem;
+        .question-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.8rem; }
+        .q-type-badge { background: #eef3fc; padding: 0.2rem 1rem; border-radius: 30px; font-size: 0.8rem; font-weight: 500; color: #0b57d0; display: inline-flex; align-items: center; gap: 6px; }
+        .question-input, .select-type {
+            width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #dadce0; border-radius: 8px;
+            font-size: 1rem; margin: 0.3rem 0 0.7rem 0; background: #fafcff; transition: 0.15s;
         }
-        .q-type-badge {
-            background: #eef3fc;
-            padding: 0.2rem 1rem;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #0b57d0;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .question-input,
-        .select-type {
-            width: 100%;
-            padding: 0.6rem 0.8rem;
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            font-size: 1rem;
-            margin: 0.3rem 0 0.7rem 0;
-            background: #fafcff;
-            transition: 0.15s;
-        }
-        .question-input:focus,
-        .select-type:focus {
-            outline: 2px solid #0b57d0;
-            outline-offset: 1px;
-            border-color: transparent;
-        }
-        .options-group {
-            margin: 0.5rem 0 0.2rem 0;
-        }
-        .option-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-        .option-row input[type="text"] {
-            flex: 1;
-            padding: 0.5rem 0.8rem;
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            background: #fafcff;
-        }
-        .option-row input[type="text"]:focus {
-            outline: 2px solid #0b57d0;
-            outline-offset: 1px;
-            border-color: transparent;
-        }
-        .correct-badge {
-            background: #e6f4ea;
-            color: #0f7b3a;
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.2rem 0.7rem;
-            border-radius: 30px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-top: 0.3rem;
-        }
-        .add-option-btn {
-            color: #0b57d0;
-            background: transparent;
-            border: none;
-            font-weight: 500;
-            cursor: pointer;
-            padding: 0.3rem 0.6rem;
-            border-radius: 20px;
-        }
-        .add-option-btn:hover {
-            background: #e8f0fe;
-        }
-        .remove-btn {
-            background: transparent;
-            border: none;
-            color: #5f6368;
-            cursor: pointer;
-            padding: 0 6px;
-            font-size: 1.1rem;
-        }
-        .remove-btn:hover {
-            color: #d93025;
-        }
-        .empty-state {
-            background: white;
-            border-radius: 16px;
-            padding: 3rem 2rem;
-            text-align: center;
-            color: #5f6368;
-        }
-        .empty-state i {
-            font-size: 3rem;
-            color: #dadce0;
-            margin-bottom: 1rem;
-        }
+        .question-input:focus, .select-type:focus { outline: 2px solid #0b57d0; outline-offset: 1px; border-color: transparent; }
+        .options-group { margin: 0.5rem 0 0.2rem 0; }
+        .option-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+        .option-row input[type="text"] { flex: 1; padding: 0.5rem 0.8rem; border: 1px solid #dadce0; border-radius: 8px; background: #fafcff; }
+        .option-row input[type="text"]:focus { outline: 2px solid #0b57d0; outline-offset: 1px; border-color: transparent; }
+        .correct-badge { background: #e6f4ea; color: #0f7b3a; font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.7rem; border-radius: 30px; display: inline-flex; align-items: center; gap: 4px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-top: 0.3rem; }
+        .add-option-btn { color: #0b57d0; background: transparent; border: none; font-weight: 500; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 20px; }
+        .add-option-btn:hover { background: #e8f0fe; }
+        .remove-btn { background: transparent; border: none; color: #5f6368; cursor: pointer; padding: 0 6px; font-size: 1.1rem; }
+        .remove-btn:hover { color: #d93025; }
+        .empty-state { background: white; border-radius: 16px; padding: 3rem 2rem; text-align: center; color: #5f6368; }
+        .empty-state i { font-size: 3rem; color: #dadce0; margin-bottom: 1rem; }
 
         .responses-section {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            margin-top: 2rem;
-            overflow-x: auto;
+            background: white; border-radius: 16px; padding: 1.5rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-top: 2rem; overflow-x: auto;
         }
-        .responses-section h3 {
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
+        .responses-section h3 { margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+        .responses-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .responses-table th { background: #f8fafc; text-align: left; padding: 0.8rem 0.6rem; border-bottom: 2px solid #e2e8f0; font-weight: 600; color: #1e293b; }
+        .responses-table td { padding: 0.7rem 0.6rem; border-bottom: 1px solid #eef2f6; vertical-align: top; }
+        .responses-table tr:hover { background: #f8fafc; }
+        .response-badge { background: #e6f4ea; color: #0f7b3a; padding: 0.1rem 0.6rem; border-radius: 30px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+        .no-responses { color: #5f6368; text-align: center; padding: 2rem; }
+        .live-indicator {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0.2rem 0.8rem; border-radius: 30px; font-size: 0.7rem; font-weight: 600;
+            background: #e6f4ea; color: #0f7b3a;
         }
-        .responses-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-        .responses-table th {
-            background: #f8fafc;
-            text-align: left;
-            padding: 0.8rem 0.6rem;
-            border-bottom: 2px solid #e2e8f0;
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .responses-table td {
-            padding: 0.7rem 0.6rem;
-            border-bottom: 1px solid #eef2f6;
-            vertical-align: top;
-        }
-        .responses-table tr:hover {
-            background: #f8fafc;
-        }
-        .response-badge {
-            background: #e6f4ea;
-            color: #0f7b3a;
-            padding: 0.1rem 0.6rem;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .no-responses {
-            color: #5f6368;
-            text-align: center;
-            padding: 2rem;
-        }
+        .live-indicator.active { background: #fef7e0; color: #e37400; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         .student-link-box {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 1rem;
-            margin: 1rem 0;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 0.8rem;
+            background: #f8fafc; border-radius: 12px; padding: 1rem; margin: 1rem 0;
+            border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem;
         }
-        .student-link-box input {
-            flex: 1;
-            padding: 0.5rem 0.8rem;
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            background: white;
-            min-width: 200px;
-        }
+        .student-link-box input { flex: 1; padding: 0.5rem 0.8rem; border: 1px solid #dadce0; border-radius: 8px; background: white; min-width: 200px; }
 
         .student-portal {
-            background: white;
-            border-radius: 16px;
-            padding: 3rem 2rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            text-align: center;
+            background: white; border-radius: 16px; padding: 3rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-align: center;
         }
-        .student-portal i {
-            font-size: 3.5rem;
-            color: #0b57d0;
-            margin-bottom: 1rem;
-        }
-        .student-portal h3 {
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: #0b1e33;
-        }
-        .student-portal p {
-            color: #5f6368;
-            max-width: 500px;
-            margin: 0 auto 1.5rem;
-        }
-        .student-portal .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            max-width: 450px;
-            margin: 0 auto;
-        }
-        .student-portal input {
-            padding: 0.7rem 1rem;
-            border: 1px solid #dadce0;
-            border-radius: 30px;
-            font-size: 1rem;
-        }
-        .student-portal input:focus {
-            outline: 2px solid #0b57d0;
-            outline-offset: 1px;
-            border-color: transparent;
-        }
+        .student-portal i { font-size: 3.5rem; color: #0b57d0; margin-bottom: 1rem; }
+        .student-portal h3 { font-weight: 500; margin-bottom: 0.5rem; color: #0b1e33; }
+        .student-portal p { color: #5f6368; max-width: 500px; margin: 0 auto 1.5rem; }
+        .student-portal .form-group { display: flex; flex-direction: column; gap: 1rem; max-width: 450px; margin: 0 auto; }
+        .student-portal input { padding: 0.7rem 1rem; border: 1px solid #dadce0; border-radius: 30px; font-size: 1rem; }
+        .student-portal input:focus { outline: 2px solid #0b57d0; outline-offset: 1px; border-color: transparent; }
 
         .exam-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: white;
-            z-index: 9999;
-            overflow-y: auto;
-            padding: 2rem 1.5rem;
-            max-width: 900px;
-            margin: 0 auto;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: white; z-index: 9999; overflow-y: auto; padding: 2rem 1.5rem;
+            max-width: 900px; margin: 0 auto; box-shadow: 0 0 40px rgba(0,0,0,0.2);
         }
-        .exam-overlay .exam-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #0b57d0;
-            padding-bottom: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .exam-overlay .exam-timer {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #0b57d0;
-        }
-        .exam-overlay .exam-timer.warning {
-            color: #d93025;
-        }
-        .exam-overlay .question-block {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid #0b57d0;
-        }
-        .exam-overlay .question-block .q-text {
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 0.8rem;
-        }
-        .exam-overlay .option-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0.4rem 0;
-        }
-        .exam-overlay .option-item input[type="radio"],
-        .exam-overlay .option-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-        .exam-overlay .short-input {
-            width: 100%;
-            padding: 0.6rem 1rem;
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            font-size: 1rem;
-            margin-top: 0.3rem;
-        }
-        .exam-overlay .submit-area {
-            margin-top: 2rem;
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 1.5rem;
-        }
-        .exam-overlay .close-exam {
-            position: fixed;
-            top: 1rem;
-            right: 1.5rem;
-            background: #d93025;
-            color: white;
-            border: none;
-            border-radius: 40px;
-            padding: 0.5rem 1.2rem;
-            font-weight: 500;
-            cursor: pointer;
-            z-index: 10000;
-        }
-        .exam-overlay .close-exam:hover {
-            background: #b71c1c;
-        }
-        .exam-overlay .exam-title {
-            font-size: 1.8rem;
-            font-weight: 500;
-            color: #0b1e33;
-        }
+        .exam-overlay .exam-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0b57d0; padding-bottom: 1rem; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .exam-overlay .exam-timer { font-size: 1.8rem; font-weight: 600; color: #0b57d0; }
+        .exam-overlay .exam-timer.warning { color: #d93025; }
+        .exam-overlay .question-block { background: #f8fafc; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border-left: 4px solid #0b57d0; }
+        .exam-overlay .question-block .q-text { font-weight: 600; font-size: 1.1rem; margin-bottom: 0.8rem; }
+        .exam-overlay .option-item { display: flex; align-items: center; gap: 10px; padding: 0.4rem 0; }
+        .exam-overlay .option-item input[type="radio"], .exam-overlay .option-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .exam-overlay .short-input { width: 100%; padding: 0.6rem 1rem; border: 1px solid #dadce0; border-radius: 8px; font-size: 1rem; margin-top: 0.3rem; }
+        .exam-overlay .submit-area { margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end; border-top: 1px solid #e2e8f0; padding-top: 1.5rem; }
+        .exam-overlay .close-exam { position: fixed; top: 1rem; right: 1.5rem; background: #d93025; color: white; border: none; border-radius: 40px; padding: 0.5rem 1.2rem; font-weight: 500; cursor: pointer; z-index: 10000; }
+        .exam-overlay .close-exam:hover { background: #b71c1c; }
+        .exam-overlay .exam-title { font-size: 1.8rem; font-weight: 500; color: #0b1e33; }
         .timer-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2.5rem;
-            flex-direction: column;
-            gap: 1rem;
-            backdrop-filter: blur(4px);
-            z-index: 99999;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 2.5rem; flex-direction: column; gap: 1rem;
+            backdrop-filter: blur(4px); z-index: 99999;
         }
-        .timer-overlay .icon {
-            font-size: 5rem;
-        }
+        .timer-overlay .icon { font-size: 5rem; }
 
-        .publish-status {
-            padding: 0.5rem 1rem;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 600;
+        .toast {
+            position: fixed; bottom: 2rem; right: 2rem;
+            background: #0b1e33; color: white; padding: 1rem 1.5rem;
+            border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 99999; max-width: 400px; animation: slideUp 0.3s ease;
         }
-        .publish-status.published {
-            background: #e6f4ea;
-            color: #0f7b3a;
-        }
-        .publish-status.unpublished {
-            background: #fef7e0;
-            color: #e37400;
-        }
-
-        .share-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 99998;
-            padding: 1rem;
-        }
-        .share-modal-content {
-            background: white;
-            border-radius: 24px;
-            padding: 2.5rem;
-            max-width: 500px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-        .share-modal-content h2 {
-            margin-bottom: 0.5rem;
-            color: #0b1e33;
-        }
-        .share-modal-content p {
-            color: #5f6368;
-            margin-bottom: 1.5rem;
-        }
-        .share-modal-content .link-box {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .share-modal-content .link-box input {
-            flex: 1;
-            padding: 0.7rem 1rem;
-            border: 1px solid #dadce0;
-            border-radius: 12px;
-            font-size: 0.9rem;
-        }
-        .share-modal-content .qr-section {
-            text-align: center;
-            padding: 1rem;
-            background: #f8fafc;
-            border-radius: 12px;
-            margin: 1rem 0;
-        }
-        .share-modal-content .qr-section canvas {
-            max-width: 200px;
-            margin: 0 auto;
-        }
+        .toast i { margin-right: 8px; }
+        .toast.success { border-left: 4px solid #0f7b3a; }
+        .toast.info { border-left: 4px solid #0b57d0; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 600px) {
-            .header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .question-card {
-                padding: 1rem;
-            }
-            .exam-tabs {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .add-exam-btn {
-                margin-left: 0;
-            }
-            .timer-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .exam-overlay {
-                padding: 1rem;
-            }
-            .responses-table {
-                font-size: 0.75rem;
-            }
-            .responses-table th,
-            .responses-table td {
-                padding: 0.4rem 0.3rem;
-            }
-            .share-modal-content {
-                padding: 1.5rem;
-            }
+            .header { flex-direction: column; align-items: stretch; }
+            .question-card { padding: 1rem; }
+            .exam-tabs { flex-direction: column; align-items: stretch; }
+            .add-exam-btn { margin-left: 0; }
+            .timer-row { flex-direction: column; align-items: stretch; }
+            .exam-overlay { padding: 1rem; }
+            .responses-table { font-size: 0.75rem; }
+            .responses-table th, .responses-table td { padding: 0.4rem 0.3rem; }
+            .toast { bottom: 1rem; right: 1rem; left: 1rem; max-width: none; }
         }
     </style>
 </head>
@@ -791,6 +217,9 @@
             <div class="header-actions">
                 <span class="save-indicator" :class="saveStatus">
                     <i class="fas" :class="saveIcon"></i> {{ saveText }}
+                </span>
+                <span class="live-indicator" :class="{ active: liveResponses }">
+                    <i class="fas fa-bolt"></i> {{ liveResponses ? 'Live' : 'Connected' }}
                 </span>
                 <button class="btn btn-outline btn-sm" @click="logoutTeacher" v-if="isTeacher"><i class="fas fa-sign-out-alt"></i> Logout</button>
                 <button class="btn btn-gold btn-sm" @click="showPasscode = true" v-if="!isTeacher"><i class="fas fa-lock"></i> Teacher Login</button>
@@ -834,8 +263,6 @@
                     <i class="fas fa-play"></i> Start Exam
                 </button>
             </div>
-
-            <!-- Available published exams -->
             <div v-if="publishedExams.length > 0" style="margin-top:2rem; text-align:left;">
                 <h4 style="margin-bottom:1rem; color:#0b1e33;"><i class="fas fa-globe"></i> Available Exams</h4>
                 <div v-for="exam in publishedExams" :key="exam.id" style="background:#f8fafc; padding:1rem; border-radius:12px; margin-bottom:0.8rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
@@ -857,11 +284,11 @@
                 <div v-for="(exam, ei) in exams" :key="ei" class="exam-tab" :class="{ active: currentExamIndex === ei }" @click="switchExam(ei)">
                     <i class="fas fa-file-alt"></i> {{ exam.name || 'Exam '+(ei+1) }}
                     <span class="badge">{{ exam.questions.length }}</span>
-                    <span class="publish-status" :class="exam.published ? 'published' : 'unpublished'" style="font-size:0.6rem; padding:0.1rem 0.6rem;">
-                        {{ exam.published ? '🌐 Published' : '🔒 Draft' }}
-                    </span>
+                    <span class="publish-status" :class="exam.published ? 'published' : 'unpublished'" style="font-size:0.6rem; padding:0.1rem 0.6rem; border-radius:30px; background:#e6f4ea; color:#0f7b3a;" v-if="exam.published">🌐 Published</span>
+                    <span class="publish-status" :class="exam.published ? 'published' : 'unpublished'" style="font-size:0.6rem; padding:0.1rem 0.6rem; border-radius:30px; background:#fef7e0; color:#e37400;" v-else>🔒 Draft</span>
                 </div>
                 <button class="btn btn-outline btn-sm add-exam-btn" @click="addExam"><i class="fas fa-plus"></i> New Exam</button>
+                <button class="btn btn-danger btn-sm" @click="deleteCurrentExam" v-if="exams.length > 1"><i class="fas fa-trash"></i> Delete</button>
             </div>
 
             <!-- Exam name + timer -->
@@ -939,13 +366,20 @@
                 <i class="fas fa-link" style="color:#0b57d0;"></i>
                 <input type="text" readonly :value="studentLink" id="studentLinkInput" />
                 <button class="btn btn-sm btn-outline" @click="copyStudentLink"><i class="fas fa-copy"></i> Copy</button>
-                <button class="btn btn-sm btn-primary" @click="shareModalOpen = true"><i class="fas fa-share-alt"></i> Share</button>
                 <a class="btn btn-sm btn-primary" :href="studentLink" target="_blank"><i class="fas fa-external-link-alt"></i> Open</a>
             </div>
 
             <!-- Responses -->
             <div class="responses-section">
-                <h3><i class="fas fa-list-ul"></i> Student Responses · {{ currentExam.name }}</h3>
+                <h3>
+                    <i class="fas fa-list-ul"></i> Student Responses · {{ currentExam.name }}
+                    <span style="font-size:0.8rem; font-weight:400; color:#5f6368; margin-left:0.5rem;">
+                        ({{ getResponsesForExam(currentExam.id).length }} submissions)
+                    </span>
+                    <button class="btn btn-danger btn-sm" @click="clearResponses" style="margin-left:auto;" v-if="getResponsesForExam(currentExam.id).length > 0">
+                        <i class="fas fa-eraser"></i> Clear Responses
+                    </button>
+                </h3>
                 <div v-if="getResponsesForExam(currentExam.id).length === 0" class="no-responses">
                     <i class="fas fa-inbox" style="font-size:2rem; display:block; margin-bottom:0.5rem;"></i>
                     No responses yet. Share the student link with your class.
@@ -988,28 +422,7 @@
             </div>
         </div>
 
-        <!-- Share Modal -->
-        <div class="share-modal" v-if="shareModalOpen" @click.self="shareModalOpen = false">
-            <div class="share-modal-content">
-                <h2><i class="fas fa-share-alt" style="color:#0b57d0;"></i> Share Exam</h2>
-                <p>Share this link with your students. They can open it on any device and take the exam.</p>
-                <div class="link-box">
-                    <input type="text" readonly :value="studentLink" id="shareLinkInput" />
-                    <button class="btn btn-sm btn-outline" @click="copyShareLink"><i class="fas fa-copy"></i></button>
-                </div>
-                <div class="qr-section">
-                    <p style="font-size:0.85rem; color:#5f6368; margin-bottom:0.5rem;">Scan with your phone camera</p>
-                    <div id="qrCodeContainer"></div>
-                </div>
-                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-                    <button class="btn btn-primary" @click="copyShareLink" style="flex:1;"><i class="fas fa-copy"></i> Copy Link</button>
-                    <a class="btn btn-success" :href="studentLink" target="_blank" style="flex:1;"><i class="fas fa-external-link-alt"></i> Open</a>
-                </div>
-                <button class="btn btn-outline" @click="shareModalOpen = false" style="width:100%; margin-top:0.5rem;">Close</button>
-            </div>
-        </div>
-
-        <!-- Exam Overlay (Student taking exam) -->
+        <!-- Exam Overlay -->
         <div class="exam-overlay" v-if="showExam" id="examOverlay">
             <button class="close-exam" @click="closeExam"><i class="fas fa-times"></i> Close</button>
             <div class="exam-header">
@@ -1047,11 +460,14 @@
                 <button class="btn btn-primary" @click="closeExam" style="margin-top:1rem;">Close</button>
             </div>
         </div>
+
+        <!-- Toast Notification -->
+        <div class="toast" v-if="toastMessage" :class="toastType">
+            <i class="fas" :class="toastIcon"></i> {{ toastMessage }}
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js">
     </script>
     <script>
         (function() {
@@ -1081,8 +497,10 @@
                     studentShortAnswers: {},
                     saveStatus: 'saved',
                     saveTimeout: null,
-                    shareModalOpen: false,
-                    qrInstance: null
+                    liveResponses: false,
+                    toastMessage: '',
+                    toastType: 'success',
+                    toastTimer: null
                 },
                 computed: {
                     currentExam() {
@@ -1106,9 +524,21 @@
                         if (this.saveStatus === 'saved') return 'fa-check-circle';
                         if (this.saveStatus === 'saving') return 'fa-spinner fa-spin';
                         return 'fa-save';
+                    },
+                    toastIcon() {
+                        return this.toastType === 'success' ? 'fa-check-circle' : 'fa-info-circle';
                     }
                 },
                 methods: {
+                    // ===== TOAST =====
+                    showToast(message, type = 'success') {
+                        this.toastMessage = message;
+                        this.toastType = type;
+                        clearTimeout(this.toastTimer);
+                        this.toastTimer = setTimeout(() => {
+                            this.toastMessage = '';
+                        }, 5000);
+                    },
                     // ===== SAVE SYSTEM =====
                     autoSave() {
                         this.saveStatus = 'saving';
@@ -1120,6 +550,7 @@
                     manualSave() {
                         this.saveToLocalStorage();
                         this.saveStatus = 'saved';
+                        this.showToast('✅ Data saved successfully!', 'success');
                         setTimeout(() => {
                             this.saveStatus = 'saved';
                         }, 2000);
@@ -1165,6 +596,7 @@
                             this.passcodeError = '';
                             localStorage.setItem('examTeacherAuth', 'true');
                             this.autoSave();
+                            this.showToast('🔓 Welcome Teacher!', 'success');
                         } else {
                             this.passcodeError = '❌ Incorrect passcode. Try again.';
                             this.passcodeInput = '';
@@ -1182,6 +614,7 @@
                         this.view = 'student';
                         localStorage.removeItem('examTeacherAuth');
                         this.autoSave();
+                        this.showToast('👋 Logged out', 'info');
                     },
                     // ===== EXAM MANAGEMENT =====
                     addExam() {
@@ -1195,6 +628,22 @@
                         });
                         this.currentExamIndex = this.exams.length - 1;
                         this.autoSave();
+                        this.showToast('📝 New exam created!', 'success');
+                    },
+                    deleteCurrentExam() {
+                        if (this.exams.length <= 1) {
+                            this.showToast('❌ Cannot delete the last exam', 'info');
+                            return;
+                        }
+                        if (confirm('Delete "' + this.currentExam.name + '" and all its responses?')) {
+                            const examId = this.currentExam.id;
+                            this.exams.splice(this.currentExamIndex, 1);
+                            // Remove responses for this exam
+                            this.responses = this.responses.filter(r => r.examId !== examId);
+                            if (this.currentExamIndex >= this.exams.length) this.currentExamIndex = this.exams.length - 1;
+                            this.autoSave();
+                            this.showToast('🗑️ Exam deleted', 'success');
+                        }
                     },
                     switchExam(index) {
                         this.currentExamIndex = index;
@@ -1213,8 +662,10 @@
                         this.autoSave();
                     },
                     removeQuestion(index) {
-                        this.currentExam.questions.splice(index, 1);
-                        this.autoSave();
+                        if (confirm('Remove this question?')) {
+                            this.currentExam.questions.splice(index, 1);
+                            this.autoSave();
+                        }
                     },
                     duplicateQuestion(index) {
                         const q = this.currentExam.questions[index];
@@ -1229,6 +680,7 @@
                         };
                         this.currentExam.questions.splice(index + 1, 0, newQ);
                         this.autoSave();
+                        this.showToast('📋 Question duplicated', 'success');
                     },
                     addOption(index) {
                         this.currentExam.questions[index].options.push('');
@@ -1267,29 +719,37 @@
                     // ===== PUBLISH =====
                     publishExam() {
                         if (!this.currentExam.questions.length) {
-                            alert('Add at least one question before publishing.');
+                            this.showToast('❌ Add at least one question first', 'info');
                             return;
                         }
                         this.currentExam.published = !this.currentExam.published;
                         this.autoSave();
                         const status = this.currentExam.published ? 'published' : 'unpublished';
-                        alert(`✅ Exam ${status}! Students can now see it in the student portal.`);
+                        this.showToast(`✅ Exam ${status}!`, 'success');
                     },
                     // ===== RESPONSES =====
                     getResponsesForExam(examId) {
                         return this.responses.filter(r => r.examId === examId);
                     },
+                    clearResponses() {
+                        const examId = this.currentExam.id;
+                        const count = this.responses.filter(r => r.examId === examId).length;
+                        if (count === 0) return;
+                        if (confirm(`Delete all ${count} responses for "${this.currentExam.name}"?`)) {
+                            this.responses = this.responses.filter(r => r.examId !== examId);
+                            this.autoSave();
+                            this.showToast(`🧹 ${count} responses cleared`, 'success');
+                        }
+                    },
                     // ===== STUDENT LINK =====
                     generateStudentLink() {
                         if (!this.currentExam.id) {
-                            alert('Please add at least one question to this exam first.');
+                            this.showToast('❌ Add at least one question first', 'info');
                             return;
                         }
                         this.autoSave();
                         this.$forceUpdate();
-                        const link = this.studentLink;
-                        alert('✅ Student link generated!\n\nShare this link with your students:\n' + link +
-                            '\n\nStudents can open this link on any device to take the exam.');
+                        this.showToast('✅ Link generated! Copy and share it.', 'success');
                     },
                     copyStudentLink() {
                         const input = document.getElementById('studentLinkInput');
@@ -1297,18 +757,9 @@
                             input.select();
                             input.setSelectionRange(0, 99999);
                             document.execCommand('copy');
-                            alert('✅ Student link copied to clipboard!');
+                            this.showToast('📋 Link copied to clipboard!', 'success');
                         } else {
-                            alert('Please generate the student link first.');
-                        }
-                    },
-                    copyShareLink() {
-                        const input = document.getElementById('shareLinkInput');
-                        if (input) {
-                            input.select();
-                            input.setSelectionRange(0, 99999);
-                            document.execCommand('copy');
-                            alert('✅ Link copied to clipboard!');
+                            this.showToast('❌ Generate the link first', 'info');
                         }
                     },
                     // ===== STUDENT PORTAL =====
@@ -1328,22 +779,21 @@
                         }
 
                         if (!examId) {
-                            alert('❌ Invalid exam link.\n\nPlease paste the full link from your teacher.');
+                            this.showToast('❌ Invalid exam link', 'info');
                             return;
                         }
 
                         const exam = this.exams.find(e => e.id === examId);
                         if (!exam) {
-                            alert('❌ Exam not found (ID: ' + examId +
-                                ').\n\nMake sure the teacher has published this exam.');
+                            this.showToast('❌ Exam not found', 'info');
                             return;
                         }
                         if (!exam.questions.length) {
-                            alert('This exam has no questions.');
+                            this.showToast('❌ This exam has no questions', 'info');
                             return;
                         }
                         if (!this.studentName.trim()) {
-                            alert('Please enter your name.');
+                            this.showToast('❌ Please enter your name', 'info');
                             return;
                         }
 
@@ -1380,7 +830,7 @@
                     },
                     submitStudentExam() {
                         if (this.examTimedOut) {
-                            alert('Time is up! The exam has been closed.');
+                            this.showToast('⏰ Time is up!', 'info');
                             return;
                         }
                         const answers = {};
@@ -1393,17 +843,21 @@
                                 answers[q.id] = this.studentShortAnswers[q.id] || '';
                             }
                         });
-                        this.responses.push({
+                        const response = {
                             id: ++this.responseIdCounter,
                             examId: this.activeExam.id,
                             studentName: this.studentName.trim(),
                             answers: answers,
                             timestamp: new Date().toLocaleString()
-                        });
-                        alert('✅ Exam submitted successfully!\n\nThank you, ' + this.studentName + '.');
+                        };
+                        this.responses.push(response);
+                        this.autoSave();
+                        this.showToast('✅ Exam submitted! Thank you, ' + this.studentName, 'success');
                         this.closeExam();
                         this.view = 'student';
-                        this.autoSave();
+                        // Simulate live response notification
+                        this.liveResponses = true;
+                        setTimeout(() => { this.liveResponses = false; }, 3000);
                     },
                     formatTime(seconds) {
                         if (seconds < 0) seconds = 0;
@@ -1430,7 +884,7 @@
                         a.click();
                         document.body.removeChild(a);
                         URL.revokeObjectURL(url);
-                        alert('✅ Data exported successfully!');
+                        this.showToast('✅ Data exported successfully!', 'success');
                     },
                     importExam() {
                         document.getElementById('fileInput').click();
@@ -1449,14 +903,14 @@
                                     this.responseIdCounter = data.nextResponseId || this.responseIdCounter;
                                     this.currentExamIndex = 0;
                                     this.saveToLocalStorage();
-                                    alert('✅ Import successful! ' + this.exams.length + ' exams, ' + this.responses
-                                        .length + ' responses.');
+                                    this.showToast('✅ Import successful! ' + this.exams.length + ' exams loaded',
+                                        'success');
                                     this.$forceUpdate();
                                 } else {
-                                    alert('Invalid format.');
+                                    this.showToast('❌ Invalid format', 'info');
                                 }
                             } catch (err) {
-                                alert('Failed to parse JSON: ' + err.message);
+                                this.showToast('❌ Failed to parse JSON', 'info');
                             }
                         };
                         reader.readAsText(file);
@@ -1472,14 +926,6 @@
                             this.studentExamLink = base + '?exam=' + examId;
                             const savedName = localStorage.getItem('examStudentName');
                             if (savedName) this.studentName = savedName;
-
-                            // Auto-open if exam exists and is published
-                            setTimeout(() => {
-                                const exam = this.exams.find(e => e.id === parseInt(examId));
-                                if (exam && exam.published) {
-                                    // Show a subtle indicator
-                                }
-                            }, 500);
                         }
                         if (localStorage.getItem('examTeacherAuth') === 'true') {
                             this.isTeacher = true;
@@ -1489,29 +935,6 @@
                 watch: {
                     studentName(val) {
                         localStorage.setItem('examStudentName', val);
-                    },
-                    shareModalOpen(val) {
-                        if (val) {
-                            // Generate QR code after modal opens
-                            this.$nextTick(() => {
-                                const container = document.getElementById('qrCodeContainer');
-                                if (container) {
-                                    container.innerHTML = '';
-                                    try {
-                                        this.qrInstance = new QRCode(container, {
-                                            text: this.studentLink,
-                                            width: 200,
-                                            height: 200,
-                                            colorDark: '#0b57d0',
-                                            colorLight: '#ffffff',
-                                            correctLevel: QRCode.CorrectLevel.H
-                                        });
-                                    } catch (e) {
-                                        console.error('QR generation failed:', e);
-                                    }
-                                }
-                            });
-                        }
                     }
                 },
                 mounted() {
