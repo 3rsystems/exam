@@ -3,1052 +3,509 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>3R-Edu Exam Portal · No Setup Required</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <title>Student Registration with Email Confirmation</title>
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background: #f0f4f9; min-height: 100vh; padding: 2rem 1rem; display: flex; justify-content: center; }
-        .app { max-width: 1200px; width: 100%; }
-        .header {
-            background: white; padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            margin-bottom: 2rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;
+        /* ===== CSS STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .header h1 { font-weight: 600; font-size: 1.7rem; color: #0b1e33; display: flex; align-items: center; gap: 0.6rem; }
-        .header h1 i { color: #0b57d0; }
-        .header-actions { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
-        .btn {
-            background: white; border: 1px solid #dadce0; padding: 0.6rem 1.2rem; border-radius: 30px;
-            font-weight: 500; color: #1e293b; cursor: pointer; transition: 0.2s;
-            display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; background: #f8fafc;
-            text-decoration: none;
-        }
-        .btn-primary { background: #0b57d0; border-color: #0b57d0; color: white; }
-        .btn-primary:hover { background: #0b4cb0; }
-        .btn-success { background: #0f7b3a; border-color: #0f7b3a; color: white; }
-        .btn-success:hover { background: #0d6a31; }
-        .btn-danger { background: #d93025; border-color: #d93025; color: white; }
-        .btn-danger:hover { background: #c6281e; }
-        .btn-outline { background: transparent; }
-        .btn-outline:hover { background: #e8edf4; }
-        .btn-sm { padding: 0.3rem 1rem; font-size: 0.8rem; }
-        .btn-exam { background: #1a73e8; border-color: #1a73e8; color: white; }
-        .btn-exam:hover { background: #1557b0; }
-        .btn-gold { background: #e37400; border-color: #e37400; color: white; }
-        .btn-gold:hover { background: #cc6600; }
-        .btn-purple { background: #7c3aed; border-color: #7c3aed; color: white; }
-        .btn-purple:hover { background: #6d28d9; }
-        .btn-teal { background: #0d9488; border-color: #0d9488; color: white; }
-        .btn-teal:hover { background: #0f766e; }
-        .btn-pink { background: #db2777; border-color: #db2777; color: white; }
-        .btn-pink:hover { background: #be185d; }
 
-        .view-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-        .view-tab {
-            background: white; padding: 0.7rem 1.5rem; border-radius: 40px; border: 1px solid #dadce0;
-            cursor: pointer; font-weight: 500; color: #1e293b; transition: 0.1s;
-            display: inline-flex; align-items: center; gap: 8px;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        .view-tab.active { background: #0b57d0; border-color: #0b57d0; color: white; }
-        .view-tab .badge { background: #eef3fc; color: #0b57d0; padding: 0 8px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; }
-        .view-tab.active .badge { background: rgba(255,255,255,0.25); color: white; }
 
-        .passcode-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
-            display: flex; align-items: center; justify-content: center; z-index: 99999;
-            padding: 1rem;
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
         }
-        .passcode-box {
-            background: white; border-radius: 24px; padding: 2.5rem; max-width: 420px; width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
-        }
-        .passcode-box i { font-size: 3rem; color: #0b57d0; margin-bottom: 1rem; }
-        .passcode-box h2 { margin-bottom: 0.5rem; color: #0b1e33; }
-        .passcode-box p { color: #5f6368; margin-bottom: 1.5rem; font-size: 0.95rem; }
-        .passcode-box input {
-            width: 100%; padding: 0.8rem 1rem; border: 2px solid #dadce0; border-radius: 12px;
-            font-size: 1.2rem; text-align: center; letter-spacing: 4px; transition: 0.2s;
-        }
-        .passcode-box input:focus { outline: none; border-color: #0b57d0; }
-        .passcode-box .error { color: #d93025; font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.5rem; }
-        .passcode-box .btn { margin-top: 1rem; width: 100%; justify-content: center; padding: 0.8rem; }
 
-        .exam-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; align-items: center; }
-        .exam-tab {
-            background: white; padding: 0.5rem 1.2rem; border-radius: 40px; border: 1px solid #dadce0;
-            cursor: pointer; font-weight: 500; color: #1e293b; transition: 0.1s;
-            display: inline-flex; align-items: center; gap: 8px;
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
         }
-        .exam-tab.active { background: #0b57d0; border-color: #0b57d0; color: white; }
-        .exam-tab .badge { background: #eef3fc; color: #0b57d0; padding: 0 8px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; }
-        .exam-tab.active .badge { background: rgba(255,255,255,0.25); color: white; }
-        .add-exam-btn { margin-left: auto; }
 
-        .timer-row {
-            display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
-            background: white; padding: 0.8rem 1.5rem; border-radius: 40px; margin-bottom: 1.5rem;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 30px;
+            font-size: 14px;
         }
-        .timer-row label { font-weight: 500; color: #1e293b; display: flex; align-items: center; gap: 0.5rem; }
-        .timer-row input { padding: 0.4rem 0.8rem; border: 1px solid #dadce0; border-radius: 30px; width: 100px; font-size: 1rem; }
-        .timer-row input:focus { outline: 2px solid #0b57d0; outline-offset: 1px; border-color: transparent; }
 
-        .question-card {
-            background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            padding: 1.5rem 2rem; margin-bottom: 1.5rem; border-left: 6px solid #0b57d0;
+        .form-group {
+            margin-bottom: 20px;
         }
-        .question-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.8rem; }
-        .q-type-badge { background: #eef3fc; padding: 0.2rem 1rem; border-radius: 30px; font-size: 0.8rem; font-weight: 500; color: #0b57d0; display: inline-flex; align-items: center; gap: 6px; }
-        .question-input, .select-type {
-            width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #dadce0; border-radius: 8px;
-            font-size: 1rem; margin: 0.3rem 0 0.7rem 0; background: #fafcff; transition: 0.15s;
-        }
-        .question-input:focus, .select-type:focus { outline: 2px solid #0b57d0; outline-offset: 1px; border-color: transparent; }
-        .options-group { margin: 0.5rem 0 0.2rem 0; }
-        .option-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
-        .option-row input[type="text"] { flex: 1; padding: 0.5rem 0.8rem; border: 1px solid #dadce0; border-radius: 8px; background: #fafcff; }
-        .option-row input[type="text"]:focus { outline: 2px solid #0b57d0; outline-offset: 1px; border-color: transparent; }
-        .correct-badge { background: #e6f4ea; color: #0f7b3a; font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.7rem; border-radius: 30px; display: inline-flex; align-items: center; gap: 4px; }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-top: 0.3rem; }
-        .add-option-btn { color: #0b57d0; background: transparent; border: none; font-weight: 500; cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 20px; }
-        .add-option-btn:hover { background: #e8f0fe; }
-        .remove-btn { background: transparent; border: none; color: #5f6368; cursor: pointer; padding: 0 6px; font-size: 1.1rem; }
-        .remove-btn:hover { color: #d93025; }
-        .empty-state { background: white; border-radius: 16px; padding: 3rem 2rem; text-align: center; color: #5f6368; }
-        .empty-state i { font-size: 3rem; color: #dadce0; margin-bottom: 1rem; }
 
-        .responses-section {
-            background: white; border-radius: 16px; padding: 1.5rem 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-top: 2rem; overflow-x: auto;
+        label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+            font-size: 14px;
         }
-        .responses-section h3 { margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
-        .responses-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .responses-table th { background: #f8fafc; text-align: left; padding: 0.8rem 0.6rem; border-bottom: 2px solid #e2e8f0; font-weight: 600; color: #1e293b; }
-        .responses-table td { padding: 0.7rem 0.6rem; border-bottom: 1px solid #eef2f6; vertical-align: top; }
-        .responses-table tr:hover { background: #f8fafc; }
-        .response-badge { background: #e6f4ea; color: #0f7b3a; padding: 0.1rem 0.6rem; border-radius: 30px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
-        .no-responses { color: #5f6368; text-align: center; padding: 2rem; }
 
-        .student-link-box {
-            background: #f8fafc; border-radius: 12px; padding: 1rem; margin: 1rem 0;
-            border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem;
+        label .required {
+            color: #ff6b6b;
         }
-        .student-link-box input { flex: 1; padding: 0.5rem 0.8rem; border: 1px solid #dadce0; border-radius: 8px; background: white; min-width: 200px; }
 
-        .student-portal {
-            background: white; border-radius: 16px; padding: 3rem 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-align: center;
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            outline: none;
+            box-sizing: border-box;
         }
-        .student-portal i { font-size: 3.5rem; color: #0b57d0; margin-bottom: 1rem; }
-        .student-portal h3 { font-weight: 500; margin-bottom: 0.5rem; color: #0b1e33; }
-        .student-portal p { color: #5f6368; max-width: 500px; margin: 0 auto 1.5rem; }
-        .student-portal .form-group { display: flex; flex-direction: column; gap: 1rem; max-width: 450px; margin: 0 auto; }
-        .student-portal input { padding: 0.7rem 1rem; border: 1px solid #dadce0; border-radius: 30px; font-size: 1rem; }
-        .student-portal input:focus { outline: 2px solid #0b57d0; outline-offset: 1px; border-color: transparent; }
 
-        .exam-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: white; z-index: 9999; overflow-y: auto; padding: 2rem 1.5rem;
-            max-width: 900px; margin: 0 auto; box-shadow: 0 0 40px rgba(0,0,0,0.2);
+        input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-        .exam-overlay .exam-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0b57d0; padding-bottom: 1rem; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
-        .exam-overlay .exam-timer { font-size: 1.8rem; font-weight: 600; color: #0b57d0; }
-        .exam-overlay .exam-timer.warning { color: #d93025; }
-        .exam-overlay .question-block { background: #f8fafc; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border-left: 4px solid #0b57d0; }
-        .exam-overlay .question-block .q-text { font-weight: 600; font-size: 1.1rem; margin-bottom: 0.8rem; }
-        .exam-overlay .option-item { display: flex; align-items: center; gap: 10px; padding: 0.4rem 0; }
-        .exam-overlay .option-item input[type="radio"], .exam-overlay .option-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
-        .exam-overlay .short-input { width: 100%; padding: 0.6rem 1rem; border: 1px solid #dadce0; border-radius: 8px; font-size: 1rem; margin-top: 0.3rem; }
-        .exam-overlay .submit-area { margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end; border-top: 1px solid #e2e8f0; padding-top: 1.5rem; }
-        .exam-overlay .close-exam { position: fixed; top: 1rem; right: 1.5rem; background: #d93025; color: white; border: none; border-radius: 40px; padding: 0.5rem 1.2rem; font-weight: 500; cursor: pointer; z-index: 10000; }
-        .exam-overlay .close-exam:hover { background: #b71c1c; }
-        .exam-overlay .exam-title { font-size: 1.8rem; font-weight: 500; color: #0b1e33; }
-        .timer-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 2.5rem; flex-direction: column; gap: 1rem;
-            backdrop-filter: blur(4px); z-index: 99999;
-        }
-        .timer-overlay .icon { font-size: 5rem; }
 
-        .toast {
-            position: fixed; bottom: 2rem; right: 2rem;
-            background: #0b1e33; color: white; padding: 1rem 1.5rem;
-            border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 99999; max-width: 400px; animation: slideUp 0.3s ease;
+        input.error {
+            border-color: #ff6b6b;
         }
-        .toast i { margin-right: 8px; }
-        .toast.success { border-left: 4px solid #0f7b3a; }
-        .toast.info { border-left: 4px solid #0b57d0; }
-        .toast.error { border-left: 4px solid #d93025; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .share-modal {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
-            display: flex; align-items: center; justify-content: center; z-index: 99998;
-            padding: 1rem;
+        input.success {
+            border-color: #51cf66;
         }
-        .share-modal-content {
-            background: white; border-radius: 24px; padding: 2.5rem;
-            max-width: 600px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .share-modal-content h2 { margin-bottom: 0.5rem; color: #0b1e33; }
-        .share-modal-content p { color: #5f6368; margin-bottom: 1.5rem; }
-        .share-modal-content .link-box { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-        .share-modal-content .link-box input { flex: 1; padding: 0.7rem 1rem; border: 1px solid #dadce0; border-radius: 12px; font-size: 0.9rem; }
-        .share-modal-content .methods { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
-        .share-modal-content .method-card {
-            padding: 1rem; border: 1px solid #e2e8f0; border-radius: 12px; text-align: center;
-            cursor: pointer; transition: 0.2s; background: #f8fafc;
-        }
-        .share-modal-content .method-card:hover { background: #e8edf4; border-color: #0b57d0; }
-        .share-modal-content .method-card i { font-size: 2rem; color: #0b57d0; display: block; margin-bottom: 0.5rem; }
 
-        @media (max-width: 600px) {
-            .header { flex-direction: column; align-items: stretch; }
-            .question-card { padding: 1rem; }
-            .exam-tabs { flex-direction: column; align-items: stretch; }
-            .add-exam-btn { margin-left: 0; }
-            .timer-row { flex-direction: column; align-items: stretch; }
-            .exam-overlay { padding: 1rem; }
-            .responses-table { font-size: 0.75rem; }
-            .responses-table th, .responses-table td { padding: 0.4rem 0.3rem; }
-            .toast { bottom: 1rem; right: 1rem; left: 1rem; max-width: none; }
-            .share-modal-content { padding: 1.5rem; }
-            .share-modal-content .methods { grid-template-columns: 1fr; }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #message.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        #message.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        #message.info {
+            display: block;
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .email-status {
+            margin-top: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            display: none;
+            background: #f8f9fa;
+        }
+
+        .email-status.active {
+            display: block;
+        }
+
+        .email-status .sent {
+            color: #51cf66;
+        }
+
+        .email-status .failed {
+            color: #ff6b6b;
+        }
+
+        .email-status .sending {
+            color: #667eea;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="app" id="app">
-        <!-- Header -->
-        <div class="header">
-            <h1><i class="fas fa-graduation-cap"></i> 3R-Edu Exam Portal</h1>
-            <div class="header-actions">
-                <button class="btn btn-outline btn-sm" @click="logoutTeacher" v-if="isTeacher"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                <button class="btn btn-gold btn-sm" @click="showPasscode = true" v-if="!isTeacher"><i class="fas fa-lock"></i> Teacher Login</button>
-            </div>
-        </div>
 
-        <!-- View Tabs -->
-        <div class="view-tabs">
-            <div class="view-tab" :class="{ active: view === 'student' }" @click="view = 'student'">
-                <i class="fas fa-user-graduate"></i> Student Portal
-                <span class="badge">{{ exams.length }} exams</span>
-            </div>
-            <div class="view-tab" :class="{ active: view === 'teacher' }" @click="switchToTeacher">
-                <i class="fas fa-chalkboard-teacher"></i> Teacher Dashboard
-                <span class="badge">{{ isTeacher ? '🔓' : '🔒' }}</span>
-            </div>
-        </div>
-
-        <!-- Passcode Overlay -->
-        <div class="passcode-overlay" v-if="showPasscode">
-            <div class="passcode-box">
-                <i class="fas fa-lock"></i>
-                <h2>Teacher Access</h2>
-                <p>Enter the passcode to access the teacher dashboard.</p>
-                <input type="password" v-model="passcodeInput" placeholder="•••••" maxlength="10" @keyup.enter="verifyPasscode" />
-                <div class="error">{{ passcodeError }}</div>
-                <button class="btn btn-primary" @click="verifyPasscode"><i class="fas fa-unlock"></i> Unlock</button>
-                <button class="btn btn-outline" @click="showPasscode = false; passcodeInput = ''; passcodeError = ''" style="margin-top:0.5rem;">Cancel</button>
-            </div>
-        </div>
-
-        <!-- Student View -->
-        <div v-if="view === 'student'" class="student-portal">
-            <i class="fas fa-users"></i>
-            <h3>Student Portal</h3>
-            <p>Enter your name and paste the exam link shared by your teacher to start.</p>
+    <div class="container">
+        <h1>📚 Student Registration</h1>
+        <p class="subtitle">Register and receive instant email confirmation</p>
+        
+        <form id="registrationForm">
             <div class="form-group">
-                <input v-model="studentName" placeholder="Your full name" />
-                <input v-model="studentExamLink" placeholder="Paste exam link here" />
-                <button class="btn btn-exam" @click="openStudentExam" style="justify-content:center; padding:0.8rem;">
-                    <i class="fas fa-play"></i> Start Exam
-                </button>
+                <label for="name">Full Name <span class="required">*</span></label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    placeholder="Enter your full name" 
+                    required 
+                    minlength="2"
+                    maxlength="100"
+                    autocomplete="name"
+                />
             </div>
-            <div v-if="exams.length > 0 && exams.some(e => e.published)" style="margin-top:2rem; text-align:left;">
-                <h4 style="margin-bottom:1rem; color:#0b1e33;"><i class="fas fa-globe"></i> Available Exams</h4>
-                <div v-for="exam in exams.filter(e => e.published)" :key="exam.id" style="background:#f8fafc; padding:1rem; border-radius:12px; margin-bottom:0.8rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-                    <div>
-                        <strong>{{ exam.name }}</strong>
-                        <span style="font-size:0.8rem; color:#5f6368; margin-left:0.5rem;">{{ exam.questions.length }} questions · {{ exam.timerMinutes || 10 }} min</span>
-                    </div>
-                    <button class="btn btn-sm btn-exam" @click="usePublishedExam(exam)">
-                        <i class="fas fa-play"></i> Take Exam
-                    </button>
-                </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address <span class="required">*</span></label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    placeholder="Enter your email" 
+                    required 
+                    autocomplete="email"
+                />
+                <div class="email-status" id="emailStatus"></div>
             </div>
-        </div>
-
-        <!-- Teacher View -->
-        <div v-if="view === 'teacher' && isTeacher">
-            <div style="display:flex; gap:1rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap;">
-                <button class="btn btn-success" @click="exportData"><i class="fas fa-download"></i> Export Data</button>
-                <button class="btn btn-outline" @click="importData"><i class="fas fa-upload"></i> Import Data</button>
-                <input type="file" id="fileInput" accept=".json" style="display:none" @change="handleImport" />
-                <span style="font-size:0.8rem; color:#5f6368;">{{ exams.length }} exams · {{ responses.length }} responses</span>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number <span class="required">*</span></label>
+                <input 
+                    type="tel" 
+                    id="phone" 
+                    placeholder="Enter your phone number" 
+                    required 
+                    pattern="[0-9+\-\s]{8,15}"
+                    title="Please enter a valid phone number (8-15 digits)"
+                    autocomplete="tel"
+                />
             </div>
-
-            <!-- Exam tabs -->
-            <div class="exam-tabs">
-                <div v-for="(exam, ei) in exams" :key="ei" class="exam-tab" :class="{ active: currentExamIndex === ei }" @click="switchExam(ei)">
-                    <i class="fas fa-file-alt"></i> {{ exam.name || 'Exam '+(ei+1) }}
-                    <span class="badge">{{ exam.questions.length }}</span>
-                    <span style="font-size:0.6rem; padding:0.1rem 0.6rem; border-radius:30px; background:#e6f4ea; color:#0f7b3a;" v-if="exam.published">🌐</span>
-                </div>
-                <button class="btn btn-outline btn-sm add-exam-btn" @click="addExam"><i class="fas fa-plus"></i> New Exam</button>
-                <button class="btn btn-danger btn-sm" @click="deleteCurrentExam" v-if="exams.length > 1"><i class="fas fa-trash"></i> Delete</button>
-            </div>
-
-            <!-- Exam name + timer -->
-            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap;">
-                <input v-model="currentExam.name" placeholder="Exam title ..." style="flex:1; padding:0.5rem 1rem; border:1px solid #dadce0; border-radius:30px; background:white; font-weight:500;" />
-                <button class="btn btn-teal" @click="publishExam"><i class="fas fa-globe"></i> {{ currentExam.published ? 'Unpublish' : 'Publish' }}</button>
-                <button class="btn btn-pink" @click="openShareModal"><i class="fas fa-share-alt"></i> Share</button>
-            </div>
-            <div class="timer-row">
-                <label><i class="fas fa-hourglass-half"></i> Timer (minutes)</label>
-                <input type="number" v-model.number="currentExam.timerMinutes" min="1" max="999" placeholder="min" />
-                <span style="font-size:0.85rem; color:#5f6368; margin-left:auto;">
-                    <i class="fas fa-info-circle"></i> Timer starts when student opens exam
-                </span>
-            </div>
-
-            <!-- Questions -->
-            <div v-for="(q, index) in currentExam.questions" :key="q.id" class="question-card">
-                <div class="question-header">
-                    <span class="q-type-badge"><i class="fas fa-tag"></i> {{ q.type || 'Multiple choice' }}</span>
-                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-                        <button class="btn btn-outline btn-sm" @click="duplicateQuestion(index)"><i class="fas fa-copy"></i></button>
-                        <button class="btn btn-danger btn-sm" @click="removeQuestion(index)"><i class="fas fa-times"></i></button>
-                    </div>
-                </div>
-                <select class="select-type" v-model="q.type" @change="onTypeChange(q)">
-                    <option value="multiple">Multiple choice</option>
-                    <option value="checkbox">Checkbox (multiple correct)</option>
-                    <option value="truefalse">True / False</option>
-                    <option value="short">Short answer</option>
-                </select>
-                <input class="question-input" v-model="q.text" placeholder="Enter question text ..." />
-                <div class="options-group" v-if="['multiple','checkbox','truefalse'].includes(q.type)">
-                    <div v-for="(opt, oi) in q.options" :key="oi" class="option-row">
-                        <span class="radio-label"><i class="far fa-circle"></i></span>
-                        <input type="text" v-model="q.options[oi]" placeholder="Option text" />
-                        <span class="correct-badge" v-if="isCorrect(q, oi)"><i class="fas fa-check-circle"></i> Correct</span>
-                        <button class="remove-btn" @click="removeOption(index, oi)" v-if="q.options.length > 2"><i class="fas fa-minus-circle"></i></button>
-                    </div>
-                    <div class="flex-between">
-                        <button class="add-option-btn" @click="addOption(index)"><i class="fas fa-plus-circle"></i> Add option</button>
-                        <div style="display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap;">
-                            <span style="font-size:0.8rem; color:#3c4043;"><i class="fas fa-flag-checkered"></i> Correct:</span>
-                            <select v-if="q.type === 'multiple'" v-model="q.correctIndex" style="padding:0.3rem 0.6rem; border-radius:20px; border:1px solid #dadce0;">
-                                <option v-for="(opt, oi) in q.options" :key="oi" :value="oi">Option {{ oi+1 }}</option>
-                            </select>
-                            <div v-if="q.type === 'checkbox'" style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-                                <span v-for="(opt, oi) in q.options" :key="oi" style="display:flex; align-items:center; gap:4px; font-size:0.8rem;">
-                                    <input type="checkbox" :value="oi" v-model="q.correctIndexes" /> {{ oi+1 }}
-                                </span>
-                            </div>
-                            <span v-if="q.type === 'truefalse'" style="font-size:0.9rem;">
-                                <select v-model="q.correctIndex" style="padding:0.2rem 0.8rem; border-radius:20px; border:1px solid #dadce0;">
-                                    <option v-for="(opt, oi) in q.options" :key="oi" :value="oi">{{ opt }}</option>
-                                </select>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div v-if="q.type === 'short'" style="margin-top:0.5rem;">
-                    <input class="question-input" v-model="q.correctAnswer" placeholder="Correct answer (optional)" style="margin:0;" />
-                    <span style="font-size:0.8rem; color:#5f6368;"><i class="fas fa-info-circle"></i> Leave blank for free text</span>
-                </div>
-            </div>
-
-            <div v-if="!currentExam.questions.length" class="empty-state">
-                <i class="fas fa-file-alt"></i>
-                <h3 style="font-weight:400; margin-bottom:0.5rem;">No questions in this exam</h3>
-                <button class="btn btn-primary" @click="addQuestion"><i class="fas fa-plus-circle"></i> Add question</button>
-            </div>
-
-            <!-- Responses -->
-            <div class="responses-section">
-                <h3>
-                    <i class="fas fa-list-ul"></i> Student Responses · {{ currentExam.name }}
-                    <span style="font-size:0.8rem; font-weight:400; color:#5f6368; margin-left:0.5rem;">
-                        ({{ getResponsesForExam(currentExam.id).length }} submissions)
-                    </span>
-                    <button class="btn btn-danger btn-sm" @click="clearResponses" style="margin-left:auto;" v-if="getResponsesForExam(currentExam.id).length > 0">
-                        <i class="fas fa-eraser"></i> Clear Responses
-                    </button>
-                </h3>
-                <div v-if="getResponsesForExam(currentExam.id).length === 0" class="no-responses">
-                    <i class="fas fa-inbox" style="font-size:2rem; display:block; margin-bottom:0.5rem;"></i>
-                    No responses yet. Share the exam with your students.
-                </div>
-                <table class="responses-table" v-else>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Student</th>
-                            <th v-for="q in currentExam.questions" :key="q.id">{{ q.text?.substring(0,20) || 'Q'+(index+1) }}</th>
-                            <th>Submitted</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(resp, ri) in getResponsesForExam(currentExam.id)" :key="ri">
-                            <td>{{ ri+1 }}</td>
-                            <td><span class="response-badge">{{ resp.studentName || 'Anonymous' }}</span></td>
-                            <td v-for="q in currentExam.questions" :key="q.id">
-                                <span v-if="q.type === 'multiple' || q.type === 'truefalse'">
-                                    {{ q.options[resp.answers[q.id]] || '—' }}
-                                </span>
-                                <span v-else-if="q.type === 'checkbox'">
-                                    {{ (resp.answers[q.id] || []).map(i => q.options[i] || '—').join(', ') || '—' }}
-                                </span>
-                                <span v-else-if="q.type === 'short'">
-                                    {{ resp.answers[q.id] || '—' }}
-                                </span>
-                            </td>
-                            <td style="font-size:0.75rem; color:#5f6368;">{{ resp.timestamp || '—' }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Share Modal -->
-        <div class="share-modal" v-if="shareModalOpen" @click.self="shareModalOpen = false">
-            <div class="share-modal-content">
-                <h2><i class="fas fa-share-alt" style="color:#0b57d0;"></i> Share Exam</h2>
-                <p>Share this exam with your students using any method below.</p>
-
-                <div class="link-box">
-                    <input type="text" readonly :value="shareableLink" id="shareLinkInput" />
-                    <button class="btn btn-sm btn-outline" @click="copyShareLink"><i class="fas fa-copy"></i></button>
-                </div>
-
-                <div class="methods">
-                    <div class="method-card" @click="shareWhatsApp">
-                        <i class="fab fa-whatsapp" style="color:#25D366;"></i>
-                        <div style="font-weight:500;">WhatsApp</div>
-                    </div>
-                    <div class="method-card" @click="shareEmail">
-                        <i class="fas fa-envelope" style="color:#D93025;"></i>
-                        <div style="font-weight:500;">Email</div>
-                    </div>
-                    <div class="method-card" @click="shareFacebook">
-                        <i class="fab fa-facebook" style="color:#1877F2;"></i>
-                        <div style="font-weight:500;">Facebook</div>
-                    </div>
-                    <div class="method-card" @click="shareTwitter">
-                        <i class="fab fa-twitter" style="color:#000000;"></i>
-                        <div style="font-weight:500;">Twitter/X</div>
-                    </div>
-                </div>
-
-                <div style="display:flex; gap:0.5rem;">
-                    <button class="btn btn-primary" @click="copyShareLink" style="flex:1;"><i class="fas fa-copy"></i> Copy Link</button>
-                    <a class="btn btn-success" :href="shareableLink" target="_blank" style="flex:1;"><i class="fas fa-external-link-alt"></i> Open</a>
-                </div>
-                <button class="btn btn-outline" @click="shareModalOpen = false" style="width:100%; margin-top:0.5rem;">Close</button>
-            </div>
-        </div>
-
-        <!-- Exam Overlay -->
-        <div class="exam-overlay" v-if="showExam" id="examOverlay">
-            <button class="close-exam" @click="closeExam"><i class="fas fa-times"></i> Close</button>
-            <div class="exam-header">
-                <span class="exam-title">{{ activeExam.name || 'Exam' }}</span>
-                <span class="exam-timer" :class="{ warning: examTimeLeft <= 60 }">
-                    <i class="fas fa-clock"></i> {{ formatTime(examTimeLeft) }}
-                </span>
-            </div>
-            <div v-for="(q, idx) in activeExam.questions" :key="q.id" class="question-block">
-                <div class="q-text">{{ idx+1 }}. {{ q.text || '[Untitled]' }}</div>
-                <div v-if="q.type === 'multiple' || q.type === 'truefalse'">
-                    <div v-for="(opt, oi) in q.options" :key="oi" class="option-item">
-                        <input type="radio" :name="'q'+q.id" :value="oi" v-model="studentAnswers[q.id]" />
-                        <span>{{ opt || '(empty)' }}</span>
-                    </div>
-                </div>
-                <div v-if="q.type === 'checkbox'">
-                    <div v-for="(opt, oi) in q.options" :key="oi" class="option-item">
-                        <input type="checkbox" :value="oi" v-model="studentCheckboxAnswers[q.id]" />
-                        <span>{{ opt || '(empty)' }}</span>
-                    </div>
-                </div>
-                <div v-if="q.type === 'short'">
-                    <input class="short-input" v-model="studentShortAnswers[q.id]" placeholder="Type your answer..." />
-                </div>
-            </div>
-            <div class="submit-area">
-                <button class="btn btn-outline" @click="closeExam"><i class="fas fa-times"></i> Close</button>
-                <button class="btn btn-success" @click="submitStudentExam"><i class="fas fa-check"></i> Submit Exam</button>
-            </div>
-            <div class="timer-overlay" v-if="examTimedOut">
-                <div class="icon">⏰</div>
-                <div>Time is up!</div>
-                <div style="font-size:1.2rem; opacity:0.8;">The exam has been closed.</div>
-                <button class="btn btn-primary" @click="closeExam" style="margin-top:1rem;">Close</button>
-            </div>
-        </div>
-
-        <!-- Toast -->
-        <div class="toast" v-if="toastMessage" :class="toastType">
-            <i class="fas" :class="toastIcon"></i> {{ toastMessage }}
-        </div>
+            
+            <button type="submit" id="registerBtn">
+                Register
+            </button>
+        </form>
+        
+        <div id="message"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js">
+    <!-- ===== EMAILJS LIBRARY ===== -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
     </script>
+    
     <script>
-        (function() {
-            const app = new Vue({
-                el: '#app',
-                data: {
-                    view: 'student',
-                    isTeacher: false,
-                    showPasscode: false,
-                    passcodeInput: '',
-                    passcodeError: '',
-                    exams: [],
-                    currentExamIndex: 0,
-                    idCounter: 0,
-                    responseIdCounter: 0,
-                    responses: [],
-                    studentName: '',
-                    studentExamLink: '',
-                    showExam: false,
-                    activeExam: null,
-                    activeExamId: null,
-                    examTimeLeft: 0,
-                    examTimerInterval: null,
-                    examTimedOut: false,
-                    studentAnswers: {},
-                    studentCheckboxAnswers: {},
-                    studentShortAnswers: {},
-                    toastMessage: '',
-                    toastType: 'success',
-                    toastTimer: null,
-                    shareModalOpen: false
-                },
-                computed: {
-                    currentExam() {
-                        return this.exams[this.currentExamIndex] || { name: 'Untitled', questions: [], timerMinutes: 10,
-                            id: null, published: false };
-                    },
-                    shareableLink() {
-                        if (!this.currentExam.id || !this.currentExam.questions.length) return '';
-                        // Encode exam data into the URL
-                        const examData = {
-                            id: this.currentExam.id,
-                            name: this.currentExam.name,
-                            questions: this.currentExam.questions,
-                            timerMinutes: this.currentExam.timerMinutes
-                        };
-                        const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(examData))));
-                        const base = window.location.href.split('?')[0];
-                        return `${base}?exam_data=${encoded}`;
-                    },
-                    toastIcon() {
-                        return this.toastType === 'success' ? 'fa-check-circle' : this.toastType === 'error' ?
-                            'fa-exclamation-circle' : 'fa-info-circle';
-                    }
-                },
-                methods: {
-                    // ===== TOAST =====
-                    showToast(message, type = 'success') {
-                        this.toastMessage = message;
-                        this.toastType = type;
-                        clearTimeout(this.toastTimer);
-                        this.toastTimer = setTimeout(() => {
-                            this.toastMessage = '';
-                        }, 5000);
-                    },
-                    // ===== DATA PERSISTENCE =====
-                    saveToLocalStorage() {
-                        try {
-                            const data = {
-                                exams: this.exams,
-                                responses: this.responses,
-                                nextId: this.idCounter,
-                                nextResponseId: this.responseIdCounter
-                            };
-                            localStorage.setItem('examSystemData', JSON.stringify(data));
-                        } catch (e) {
-                            console.error('Save failed:', e);
-                        }
-                    },
-                    loadFromLocalStorage() {
-                        try {
-                            const saved = localStorage.getItem('examSystemData');
-                            if (saved) {
-                                const data = JSON.parse(saved);
-                                this.exams = data.exams || [];
-                                this.responses = data.responses || [];
-                                this.idCounter = data.nextId || 0;
-                                this.responseIdCounter = data.nextResponseId || 0;
-                                return true;
-                            }
-                        } catch (e) {
-                            console.error('Load failed:', e);
-                        }
-                        return false;
-                    },
-                    exportData() {
-                        this.saveToLocalStorage();
-                        const data = JSON.stringify({
-                            exams: this.exams,
-                            responses: this.responses,
-                            nextId: this.idCounter,
-                            nextResponseId: this.responseIdCounter,
-                            exportedAt: new Date().toISOString()
-                        }, null, 2);
-                        const blob = new Blob([data], { type: 'application/json' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'exam_system_data.json';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        this.showToast('✅ Data exported successfully!', 'success');
-                    },
-                    importData() {
-                        document.getElementById('fileInput').click();
-                    },
-                    handleImport(event) {
-                        const file = event.target.files[0];
-                        if (!file) return;
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            try {
-                                const data = JSON.parse(e.target.result);
-                                if (data.exams && Array.isArray(data.exams)) {
-                                    this.exams = data.exams;
-                                    this.responses = data.responses || [];
-                                    this.idCounter = data.nextId || this.idCounter;
-                                    this.responseIdCounter = data.nextResponseId || this.responseIdCounter;
-                                    this.currentExamIndex = 0;
-                                    this.saveToLocalStorage();
-                                    this.showToast('✅ Import successful! ' + this.exams.length + ' exams loaded',
-                                        'success');
-                                    this.$forceUpdate();
-                                } else {
-                                    this.showToast('❌ Invalid format', 'error');
-                                }
-                            } catch (err) {
-                                this.showToast('❌ Failed to parse JSON', 'error');
-                            }
-                        };
-                        reader.readAsText(file);
-                        event.target.value = '';
-                    },
-                    // ===== PASSCODE =====
-                    verifyPasscode() {
-                        if (this.passcodeInput === '18533') {
-                            this.isTeacher = true;
-                            this.view = 'teacher';
-                            this.showPasscode = false;
-                            this.passcodeInput = '';
-                            this.passcodeError = '';
-                            localStorage.setItem('examTeacherAuth', 'true');
-                            this.showToast('🔓 Welcome Teacher!', 'success');
-                        } else {
-                            this.passcodeError = '❌ Incorrect passcode. Try again.';
-                            this.passcodeInput = '';
-                        }
-                    },
-                    switchToTeacher() {
-                        if (this.isTeacher) {
-                            this.view = 'teacher';
-                        } else {
-                            this.showPasscode = true;
-                        }
-                    },
-                    logoutTeacher() {
-                        this.isTeacher = false;
-                        this.view = 'student';
-                        localStorage.removeItem('examTeacherAuth');
-                        this.showToast('👋 Logged out', 'info');
-                    },
-                    // ===== EXAM MANAGEMENT =====
-                    addExam() {
-                        const id = ++this.idCounter;
-                        this.exams.push({
-                            id: id,
-                            name: 'Exam ' + (this.exams.length + 1),
-                            questions: [],
-                            timerMinutes: 10,
-                            published: false
-                        });
-                        this.currentExamIndex = this.exams.length - 1;
-                        this.showToast('📝 New exam created!', 'success');
-                        this.saveToLocalStorage();
-                    },
-                    deleteCurrentExam() {
-                        if (this.exams.length <= 1) {
-                            this.showToast('❌ Cannot delete the last exam', 'info');
-                            return;
-                        }
-                        if (confirm('Delete "' + this.currentExam.name + '" and all its responses?')) {
-                            const examId = this.currentExam.id;
-                            this.exams.splice(this.currentExamIndex, 1);
-                            this.responses = this.responses.filter(r => r.examId !== examId);
-                            if (this.currentExamIndex >= this.exams.length) this.currentExamIndex = this.exams.length - 1;
-                            this.showToast('🗑️ Exam deleted', 'success');
-                            this.saveToLocalStorage();
-                        }
-                    },
-                    switchExam(index) {
-                        this.currentExamIndex = index;
-                    },
-                    addQuestion() {
-                        const q = {
-                            id: ++this.idCounter,
-                            type: 'multiple',
-                            text: '',
-                            options: ['', ''],
-                            correctIndex: 0,
-                            correctIndexes: [],
-                            correctAnswer: ''
-                        };
-                        this.currentExam.questions.push(q);
-                        this.saveToLocalStorage();
-                    },
-                    removeQuestion(index) {
-                        if (confirm('Remove this question?')) {
-                            this.currentExam.questions.splice(index, 1);
-                            this.saveToLocalStorage();
-                        }
-                    },
-                    duplicateQuestion(index) {
-                        const q = this.currentExam.questions[index];
-                        const newQ = {
-                            id: ++this.idCounter,
-                            type: q.type,
-                            text: q.text,
-                            options: [...q.options],
-                            correctIndex: q.correctIndex,
-                            correctIndexes: [...(q.correctIndexes || [])],
-                            correctAnswer: q.correctAnswer || ''
-                        };
-                        this.currentExam.questions.splice(index + 1, 0, newQ);
-                        this.showToast('📋 Question duplicated', 'success');
-                        this.saveToLocalStorage();
-                    },
-                    addOption(index) {
-                        this.currentExam.questions[index].options.push('');
-                        this.saveToLocalStorage();
-                    },
-                    removeOption(qIndex, oIndex) {
-                        const q = this.currentExam.questions[qIndex];
-                        if (q.options.length <= 2) return;
-                        q.options.splice(oIndex, 1);
-                        if (q.correctIndex >= q.options.length) q.correctIndex = q.options.length - 1;
-                        if (q.correctIndexes) {
-                            q.correctIndexes = q.correctIndexes.filter(i => i < q.options.length);
-                        }
-                        this.saveToLocalStorage();
-                    },
-                    onTypeChange(q) {
-                        if (q.type === 'truefalse') {
-                            q.options = ['True', 'False'];
-                            q.correctIndex = 0;
-                        } else if (q.type === 'short') {
-                            q.options = [];
-                            q.correctIndex = undefined;
-                            q.correctIndexes = [];
-                        } else {
-                            if (!q.options || q.options.length < 2) q.options = ['', ''];
-                            q.correctIndex = 0;
-                        }
-                        this.saveToLocalStorage();
-                    },
-                    isCorrect(q, oi) {
-                        if (q.type === 'checkbox') {
-                            return q.correctIndexes && q.correctIndexes.includes(oi);
-                        }
-                        return q.correctIndex === oi;
-                    },
-                    // ===== PUBLISH =====
-                    publishExam() {
-                        if (!this.currentExam.questions.length) {
-                            this.showToast('❌ Add at least one question first', 'info');
-                            return;
-                        }
-                        this.currentExam.published = !this.currentExam.published;
-                        const status = this.currentExam.published ? 'published' : 'unpublished';
-                        this.showToast(`✅ Exam ${status}!`, 'success');
-                        this.saveToLocalStorage();
-                    },
-                    // ===== SHARING =====
-                    openShareModal() {
-                        if (!this.currentExam.questions.length) {
-                            this.showToast('❌ Add at least one question first', 'info');
-                            return;
-                        }
-                        this.shareModalOpen = true;
-                        this.saveToLocalStorage();
-                    },
-                    copyShareLink() {
-                        const input = document.getElementById('shareLinkInput');
-                        if (input && input.value) {
-                            input.select();
-                            input.setSelectionRange(0, 99999);
-                            document.execCommand('copy');
-                            this.showToast('📋 Link copied to clipboard!', 'success');
-                        }
-                    },
-                    shareWhatsApp() {
-                        const text = `📝 ${this.currentExam.name}\n\nClick here to take the exam:\n${this.shareableLink}`;
-                        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-                    },
-                    shareEmail() {
-                        const subject = encodeURIComponent(`📝 ${this.currentExam.name} - Exam Link`);
-                        const body = encodeURIComponent(
-                            `Hello,\n\nYou have been invited to take the exam "${this.currentExam.name}".\n\nClick the link below to start:\n${this.shareableLink}\n\nGood luck!`
-                            );
-                        window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
-                    },
-                    shareFacebook() {
-                        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.shareableLink)}`,
-                            '_blank');
-                    },
-                    shareTwitter() {
-                        const text = encodeURIComponent(`📝 ${this.currentExam.name} - Take the exam here:`);
-                        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(this.shareableLink)}`,
-                            '_blank');
-                    },
-                    // ===== RESPONSES =====
-                    getResponsesForExam(examId) {
-                        return this.responses.filter(r => r.examId === examId);
-                    },
-                    clearResponses() {
-                        const examId = this.currentExam.id;
-                        const count = this.responses.filter(r => r.examId === examId).length;
-                        if (count === 0) return;
-                        if (confirm(`Delete all ${count} responses for "${this.currentExam.name}"?`)) {
-                            this.responses = this.responses.filter(r => r.examId !== examId);
-                            this.showToast(`🧹 ${count} responses cleared`, 'success');
-                            this.saveToLocalStorage();
-                        }
-                    },
-                    // ===== STUDENT PORTAL =====
-                    usePublishedExam(exam) {
-                        // Encode exam data and open
-                        const examData = {
-                            id: exam.id,
-                            name: exam.name,
-                            questions: exam.questions,
-                            timerMinutes: exam.timerMinutes
-                        };
-                        const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(examData))));
-                        this.studentExamLink = window.location.href.split('?')[0] + '?exam_data=' + encoded;
-                        this.openStudentExam();
-                    },
-                    openStudentExam() {
-                        let examData = null;
+        // ============================================
+        // 📧 EMAILJS CONFIGURATION - UPDATE THESE!
+        // ============================================
+        const EMAILJS_CONFIG = {
+            PUBLIC_KEY: 'LlX_AFjkLzB3vkvv0',    // Example: 'user_abc123xyz'
+            SERVICE_ID: 'service_t0gag7f',    // Example: 'service_abc123'
+            TEMPLATE_ID: 'template_0su5dou'   // Example: 'template_xyz789'
+        };
 
-                        // Check if we have encoded data in the link
-                        const params = new URLSearchParams(window.location.search);
-                        const encodedData = params.get('exam_data');
+        // ============================================
+        // GOOGLE SHEETS CONFIGURATION
+        // ============================================
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx5IitVMy4sVUjKsLPDynI9vq2wxhI7le0mNEHobTbGdmlnbG5eFP52RFRHXllJbGPv_w/exec';
 
-                        if (encodedData) {
-                            try {
-                                const decoded = decodeURIComponent(escape(atob(encodedData)));
-                                examData = JSON.parse(decoded);
-                            } catch (e) {
-                                console.error('Failed to decode exam data:', e);
-                            }
-                        }
+        // Initialize EmailJS
+        try {
+            emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+            console.log('✅ EmailJS initialized successfully');
+        } catch (error) {
+            console.error('❌ EmailJS initialization failed:', error);
+        }
 
-                        // If we have a link with exam_data parameter
-                        if (this.studentExamLink.includes('exam_data=')) {
-                            const match = this.studentExamLink.match(/exam_data=([^&]+)/);
-                            if (match) {
-                                try {
-                                    const decoded = decodeURIComponent(escape(atob(match[1])));
-                                    examData = JSON.parse(decoded);
-                                } catch (e) {
-                                    console.error('Failed to decode exam data from link:', e);
-                                }
-                            }
-                        }
+        // DOM elements
+        const form = document.getElementById('registrationForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+        const registerBtn = document.getElementById('registerBtn');
+        const messageDiv = document.getElementById('message');
+        const emailStatus = document.getElementById('emailStatus');
 
-                        // If no exam data found, try to find by ID
-                        if (!examData) {
-                            let examId = null;
-                            if (this.studentExamLink.includes('?exam=')) {
-                                const match = this.studentExamLink.match(/[?&]exam=(\d+)/);
-                                if (match) examId = parseInt(match[1]);
-                            }
-                            if (examId) {
-                                const exam = this.exams.find(e => e.id === examId);
-                                if (exam) {
-                                    examData = {
-                                        id: exam.id,
-                                        name: exam.name,
-                                        questions: exam.questions,
-                                        timerMinutes: exam.timerMinutes
-                                    };
-                                }
-                            }
-                        }
+        // Helper function to show message
+        function showMessage(text, type = 'success') {
+            messageDiv.textContent = text;
+            messageDiv.className = type;
+            messageDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 7000);
+            }
+        }
 
-                        if (!examData) {
-                            this.showToast('❌ Invalid exam link. Please ask your teacher for a new link.', 'error');
-                            return;
-                        }
+        // Helper function to set loading state
+        function setLoading(isLoading) {
+            if (isLoading) {
+                registerBtn.disabled = true;
+                registerBtn.innerHTML = '<span class="loading-spinner"></span> Processing...';
+            } else {
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+            }
+        }
 
-                        if (!examData.questions || !examData.questions.length) {
-                            this.showToast('❌ This exam has no questions', 'info');
-                            return;
-                        }
-                        if (!this.studentName.trim()) {
-                            this.showToast('❌ Please enter your name', 'info');
-                            return;
-                        }
-
-                        // Find or create the exam in the system
-                        let exam = this.exams.find(e => e.id === examData.id);
-                        if (!exam) {
-                            // Create a local copy
-                            exam = {
-                                id: examData.id,
-                                name: examData.name,
-                                questions: examData.questions,
-                                timerMinutes: examData.timerMinutes || 10,
-                                published: true
-                            };
-                            // Add to exams if not exists
-                            if (!this.exams.find(e => e.id === examData.id)) {
-                                this.exams.push(exam);
-                                this.saveToLocalStorage();
-                            }
-                        }
-
-                        this.activeExam = exam;
-                        this.activeExamId = exam.id;
-                        this.showExam = true;
-                        this.examTimedOut = false;
-                        this.studentAnswers = {};
-                        this.studentCheckboxAnswers = {};
-                        this.studentShortAnswers = {};
-                        const minutes = exam.timerMinutes || 10;
-                        this.examTimeLeft = minutes * 60;
-                        if (this.examTimerInterval) clearInterval(this.examTimerInterval);
-                        this.examTimerInterval = setInterval(() => {
-                            this.examTimeLeft--;
-                            if (this.examTimeLeft <= 0) {
-                                this.examTimeLeft = 0;
-                                this.examTimedOut = true;
-                                clearInterval(this.examTimerInterval);
-                                this.examTimerInterval = null;
-                            }
-                        }, 1000);
-                        document.body.style.overflow = 'hidden';
-                    },
-                    closeExam() {
-                        this.showExam = false;
-                        this.activeExam = null;
-                        this.activeExamId = null;
-                        if (this.examTimerInterval) {
-                            clearInterval(this.examTimerInterval);
-                            this.examTimerInterval = null;
-                        }
-                        document.body.style.overflow = '';
-                    },
-                    submitStudentExam() {
-                        if (this.examTimedOut) {
-                            this.showToast('⏰ Time is up!', 'info');
-                            return;
-                        }
-                        const answers = {};
-                        this.activeExam.questions.forEach(q => {
-                            if (q.type === 'multiple' || q.type === 'truefalse') {
-                                answers[q.id] = this.studentAnswers[q.id];
-                            } else if (q.type === 'checkbox') {
-                                answers[q.id] = this.studentCheckboxAnswers[q.id] || [];
-                            } else if (q.type === 'short') {
-                                answers[q.id] = this.studentShortAnswers[q.id] || '';
-                            }
-                        });
-                        const response = {
-                            id: ++this.responseIdCounter,
-                            examId: this.activeExam.id,
-                            studentName: this.studentName.trim(),
-                            answers: answers,
-                            timestamp: new Date().toLocaleString()
-                        };
-                        this.responses.push(response);
-                        this.saveToLocalStorage();
-                        this.showToast('✅ Exam submitted! Thank you, ' + this.studentName, 'success');
-                        this.closeExam();
-                        this.view = 'student';
-                    },
-                    formatTime(seconds) {
-                        if (seconds < 0) seconds = 0;
-                        const m = Math.floor(seconds / 60);
-                        const s = seconds % 60;
-                        return `${m}:${s.toString().padStart(2, '0')}`;
-                    },
-                    // ===== LOAD FROM URL =====
-                    loadFromURL() {
-                        const params = new URLSearchParams(window.location.search);
-
-                        // Check for encoded exam data
-                        const encodedData = params.get('exam_data');
-                        if (encodedData) {
-                            this.view = 'student';
-                            const base = window.location.href.split('?')[0];
-                            this.studentExamLink = base + '?exam_data=' + encodedData;
-                            const savedName = localStorage.getItem('examStudentName');
-                            if (savedName) this.studentName = savedName;
-                            // Auto-open the exam
-                            setTimeout(() => {
-                                this.openStudentExam();
-                            }, 500);
-                        }
-
-                        // Check for legacy exam ID
-                        const examId = params.get('exam');
-                        if (examId && !encodedData) {
-                            this.view = 'student';
-                            const base = window.location.href.split('?')[0];
-                            this.studentExamLink = base + '?exam=' + examId;
-                            const savedName = localStorage.getItem('examStudentName');
-                            if (savedName) this.studentName = savedName;
-                            setTimeout(() => {
-                                this.openStudentExam();
-                            }, 500);
-                        }
-
-                        if (localStorage.getItem('examTeacherAuth') === 'true') {
-                            this.isTeacher = true;
-                        }
-                    }
-                },
-                watch: {
-                    studentName(val) {
-                        localStorage.setItem('examStudentName', val);
-                    }
-                },
-                mounted() {
-                    const hasData = this.loadFromLocalStorage();
-                    if (!hasData) {
-                        this.exams = [];
-                        this.responses = [];
-                        this.idCounter = 0;
-                        this.responseIdCounter = 0;
-                        this.saveToLocalStorage();
-                    }
-                    this.loadFromURL();
+        // ============================================
+        // 📧 SEND CONFIRMATION EMAIL
+        // ============================================
+        async function sendConfirmationEmail(studentData) {
+            try {
+                // Validate email
+                if (!studentData.email || studentData.email.trim() === '') {
+                    throw new Error('Email address is empty');
                 }
-            });
-        })();
+
+                emailStatus.className = 'email-status active';
+                emailStatus.innerHTML = '<span class="sending">⏳ Sending confirmation email...</span>';
+
+                // Prepare template parameters
+                const templateParams = {
+                    to_email: studentData.email.trim(),
+                    to_name: studentData.name.trim(),
+                    student_name: studentData.name.trim(),
+                    registration_date: new Date().toLocaleString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }),
+                    phone: studentData.phone.trim(),
+                    user_email: studentData.email.trim(),
+                    user_name: studentData.name.trim()
+                };
+
+                // Send email
+                const response = await emailjs.send(
+                    EMAILJS_CONFIG.SERVICE_ID,
+                    EMAILJS_CONFIG.TEMPLATE_ID,
+                    templateParams
+                );
+
+                emailStatus.innerHTML = '<span class="sent">✅ Confirmation email sent successfully!</span>';
+                return true;
+            } catch (error) {
+                console.error('Email error:', error);
+                
+                let errorMessage = '⚠️ Could not send email. ';
+                if (error.text) {
+                    errorMessage += error.text;
+                } else if (error.message) {
+                    errorMessage += error.message;
+                }
+                
+                emailStatus.innerHTML = `<span class="failed">${errorMessage}</span>`;
+                return false;
+            }
+        }
+
+        // ============================================
+        // SAVE TO GOOGLE SHEETS
+        // ============================================
+        async function saveToGoogleSheets(studentData, emailSent) {
+            try {
+                const dataToSave = {
+                    name: studentData.name,
+                    email: studentData.email,
+                    phone: studentData.phone,
+                    emailSent: emailSent ? 'Yes' : 'No',
+                    status: emailSent ? 'Confirmed' : 'Registration Only',
+                    timestamp: new Date().toISOString()
+                };
+
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(dataToSave)
+                });
+
+                return true;
+            } catch (error) {
+                console.error('Google Sheets save error:', error);
+                return false;
+            }
+        }
+
+        // ============================================
+        // FORM SUBMISSION HANDLER
+        // ============================================
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Clear previous messages
+            messageDiv.style.display = 'none';
+            emailStatus.className = 'email-status';
+            
+            // Get form data
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const phone = phoneInput.value.trim();
+
+            // Validation
+            if (!name || !email || !phone) {
+                showMessage('Please fill in all fields.', 'error');
+                return;
+            }
+
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('Please enter a valid email address.', 'error');
+                return;
+            }
+
+            // Phone validation
+            const phoneRegex = /^[0-9+\-\s]{8,15}$/;
+            if (!phoneRegex.test(phone)) {
+                showMessage('Please enter a valid phone number (8-15 digits).', 'error');
+                return;
+            }
+
+            // Prepare student data
+            const studentData = {
+                name: name,
+                email: email,
+                phone: phone,
+                timestamp: new Date().toISOString()
+            };
+
+            setLoading(true);
+
+            let emailSent = false;
+            let savedToSheets = false;
+
+            try {
+                // Step 1: Send email
+                emailSent = await sendConfirmationEmail(studentData);
+                
+                // Step 2: Save to Google Sheets
+                savedToSheets = await saveToGoogleSheets(studentData, emailSent);
+
+                // Show final result
+                if (savedToSheets && emailSent) {
+                    showMessage('✅ Registration successful! Confirmation email sent to ' + email, 'success');
+                    form.reset();
+                } else if (savedToSheets && !emailSent) {
+                    showMessage('✅ Registration saved! But email could not be sent. Please check console.', 'info');
+                    form.reset();
+                } else if (!savedToSheets && emailSent) {
+                    showMessage('⚠️ Email sent! But data could not be saved to spreadsheet.', 'info');
+                    form.reset();
+                } else {
+                    showMessage('❌ Registration failed. Please try again.', 'error');
+                }
+
+            } catch (error) {
+                console.error('Registration error:', error);
+                showMessage('❌ Registration failed. Please try again.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // ============================================
+        // REAL-TIME VALIDATION
+        // ============================================
+        nameInput.addEventListener('input', function() {
+            const valid = this.value.trim().length >= 2;
+            this.className = this.value ? (valid ? 'success' : 'error') : '';
+        });
+
+        emailInput.addEventListener('input', function() {
+            const email = this.value.trim();
+            const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            this.className = email ? (valid ? 'success' : 'error') : '';
+            
+            if (email && valid) {
+                emailStatus.className = 'email-status active';
+                emailStatus.innerHTML = '<span class="sent">✅ Valid email - Confirmation will be sent here</span>';
+            } else if (email) {
+                emailStatus.className = 'email-status active';
+                emailStatus.innerHTML = '<span class="failed">⚠️ Please enter a valid email address</span>';
+            } else {
+                emailStatus.className = 'email-status';
+            }
+        });
+
+        phoneInput.addEventListener('input', function() {
+            const valid = /^[0-9+\-\s]{8,15}$/.test(this.value.trim());
+            this.className = this.value ? (valid ? 'success' : 'error') : '';
+        });
+
+        console.log('✅ Student Registration System loaded successfully!');
     </script>
 </body>
 </html>
