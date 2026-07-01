@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cloud Exam System · Live Responses</title>
+    <title>3R-Edu Exam Portal · Cloud</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
@@ -134,13 +134,6 @@
         .responses-table tr:hover { background: #f8fafc; }
         .response-badge { background: #e6f4ea; color: #0f7b3a; padding: 0.1rem 0.6rem; border-radius: 30px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
         .no-responses { color: #5f6368; text-align: center; padding: 2rem; }
-        .live-indicator {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 0.2rem 0.8rem; border-radius: 30px; font-size: 0.7rem; font-weight: 600;
-            background: #e6f4ea; color: #0f7b3a;
-        }
-        .live-indicator.active { background: #fef7e0; color: #e37400; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         .student-link-box {
             background: #f8fafc; border-radius: 12px; padding: 1rem; margin: 1rem 0;
@@ -221,7 +214,7 @@
     <div class="app" id="app">
         <!-- Header -->
         <div class="header">
-            <h1><i class="fas fa-cloud"></i> Cloud Exam System</h1>
+            <h1><i class="fas fa-cloud"></i> 3R-Edu Exam Portal</h1>
             <div class="header-actions">
                 <span class="cloud-status" :class="cloudStatus">
                     <i class="fas" :class="cloudIcon"></i> {{ cloudText }}
@@ -474,12 +467,13 @@
     <script>
         (function() {
             // ===== CLOUD CONFIGURATION =====
-            // You need to create a free JSONBin account and get your API key
-            // https://jsonbin.io/
+            // FREE JSONBin.io account - replace with your own
             const CLOUD_CONFIG = {
-                // Replace these with your actual JSONBin credentials
-                API_KEY: '$2a$10$hYQkR6BvH5w2rJ8kLmNpXeFgHjKlMnOpQrStUvWxYzAbCdEfGhIjK',
-                BIN_ID: '67d8f9d98a456b79667f3a4e',
+                // Sign up at https://jsonbin.io/ and get your API key
+                // Your API key from: https://jsonbin.io/api-keys
+                API_KEY: '$2a$10$MpSqFgHjKlMnOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWx',
+                // Your bin ID from: https://jsonbin.io/ (create a new bin)
+                BIN_ID: '67e0f4b28a456b79667f4c2d',
                 BASE_URL: 'https://api.jsonbin.io/v3/b/'
             };
 
@@ -512,8 +506,7 @@
                     toastTimer: null,
                     cloudStatus: 'connecting',
                     cloudText: 'Connecting...',
-                    lastSync: null,
-                    syncTimeout: null
+                    lastSync: null
                 },
                 computed: {
                     currentExam() {
@@ -574,13 +567,15 @@
                                 this.lastSync = new Date().toLocaleString();
                                 this.showToast('✅ Data synced to cloud!', 'success');
                             } else {
-                                throw new Error('Upload failed');
+                                const errorData = await response.json();
+                                console.error('Upload error:', errorData);
+                                throw new Error('Upload failed: ' + (errorData.message || 'Unknown error'));
                             }
                         } catch (e) {
                             console.error('Sync to cloud error:', e);
                             this.cloudStatus = 'error';
                             this.cloudText = 'Sync Error';
-                            this.showToast('❌ Failed to sync to cloud. Check API key.', 'error');
+                            this.showToast('❌ Failed to sync to cloud: ' + e.message, 'error');
                         }
                     },
                     async syncFromCloud() {
@@ -611,24 +606,26 @@
                                     throw new Error('Invalid data format');
                                 }
                             } else {
-                                throw new Error('Download failed');
+                                const errorData = await response.json();
+                                console.error('Download error:', errorData);
+                                throw new Error('Download failed: ' + (errorData.message || 'Unknown error'));
                             }
                         } catch (e) {
                             console.error('Sync from cloud error:', e);
                             this.cloudStatus = 'error';
                             this.cloudText = 'Sync Error';
-                            this.showToast('❌ Failed to sync from cloud. Check your connection.', 'error');
+                            this.showToast('❌ Failed to sync from cloud: ' + e.message, 'error');
                         }
                     },
                     // ===== AUTO SYNC =====
                     autoSyncToCloud() {
-                        // Auto-sync after changes (debounced)
-                        if (this.syncTimeout) clearTimeout(this.syncTimeout);
-                        this.syncTimeout = setTimeout(() => {
-                            if (this.isTeacher) {
+                        if (this.isTeacher) {
+                            // Debounced auto-sync
+                            clearTimeout(this._syncTimeout);
+                            this._syncTimeout = setTimeout(() => {
                                 this.syncToCloud();
-                            }
-                        }, 3000);
+                            }, 3000);
+                        }
                     },
                     // ===== PASSCODE =====
                     verifyPasscode() {
@@ -640,7 +637,6 @@
                             this.passcodeError = '';
                             localStorage.setItem('examTeacherAuth', 'true');
                             this.showToast('🔓 Welcome Teacher!', 'success');
-                            // Auto-sync from cloud
                             this.syncFromCloud();
                         } else {
                             this.passcodeError = '❌ Incorrect passcode. Try again.';
@@ -832,7 +828,6 @@
                         try {
                             await this.syncFromCloud();
                         } catch (e) {
-                            // If sync fails, use local data
                             console.log('Using local data');
                         }
 
@@ -931,7 +926,6 @@
                             // Auto-try to sync from cloud
                             setTimeout(() => {
                                 this.syncFromCloud().then(() => {
-                                    // Check if exam exists after sync
                                     const exam = this.exams.find(e => e.id === parseInt(examId));
                                     if (exam && exam.published) {
                                         // Student can now take the exam
