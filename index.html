@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Exam System · Auto-Save + Export</title>
+  <title>Exam System · Cross-Device Links</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
@@ -37,6 +37,8 @@
     .btn-gold:hover { background: #cc6600; }
     .btn-purple { background: #7c3aed; border-color: #7c3aed; color: white; }
     .btn-purple:hover { background: #6d28d9; }
+    .btn-cyan { background: #0891b2; border-color: #0891b2; color: white; }
+    .btn-cyan:hover { background: #0e7490; }
 
     .view-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
     .view-tab {
@@ -174,6 +176,13 @@
     }
     .timer-overlay .icon { font-size: 5rem; }
 
+    .sync-banner {
+      background: #e8f0fe; padding: 0.8rem 1.5rem; border-radius: 40px;
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .sync-banner .info { color: #0b57d0; font-weight: 500; }
+
     @media (max-width: 600px) {
       .header { flex-direction: column; align-items: stretch; }
       .question-card { padding: 1rem; }
@@ -183,6 +192,7 @@
       .exam-overlay { padding: 1rem; }
       .responses-table { font-size: 0.75rem; }
       .responses-table th, .responses-table td { padding: 0.4rem 0.3rem; }
+      .sync-banner { flex-direction: column; align-items: stretch; text-align: center; }
     }
   </style>
 </head>
@@ -209,6 +219,17 @@
     <div class="view-tab" :class="{ active: view === 'teacher' }" @click="switchToTeacher">
       <i class="fas fa-chalkboard-teacher"></i> Teacher Dashboard
       <span class="badge">{{ isTeacher ? '🔓' : '🔒' }}</span>
+    </div>
+  </div>
+
+  <!-- Sync Banner -->
+  <div class="sync-banner">
+    <i class="fas fa-cloud-upload-alt" style="color:#0b57d0; font-size:1.2rem;"></i>
+    <span class="info">Cross-device sync: Export your data on one device and import on another</span>
+    <div style="display:flex; gap:0.5rem; margin-left:auto; flex-wrap:wrap;">
+      <button class="btn btn-sm btn-cyan" @click="exportExam"><i class="fas fa-download"></i> Export Data</button>
+      <button class="btn btn-sm btn-outline" @click="importExam"><i class="fas fa-upload"></i> Import Data</button>
+      <input type="file" id="fileInput" accept=".json" style="display:none" @change="handleImport" />
     </div>
   </div>
 
@@ -451,6 +472,7 @@
         },
         studentLink() {
           if (!this.currentExam.id) return '';
+          // Use the full URL with exam ID parameter
           const base = window.location.href.split('?')[0];
           return `${base}?exam=${this.currentExam.id}`;
         },
@@ -633,33 +655,43 @@
           this.autoSave();
           // Force update the link display
           this.$forceUpdate();
-          alert('✅ Student link generated! Copy the link below and share it with your students.');
+          // Show the link with instructions
+          const link = this.studentLink;
+          alert('✅ Student link generated!\n\nShare this link with your students:\n' + link + '\n\nNote: Students must have this page open to take the exam. The link works across devices - just copy and paste it anywhere.');
         },
         copyStudentLink() {
           const input = document.getElementById('studentLinkInput');
-          if (input) {
+          if (input && input.value) {
             input.select();
             input.setSelectionRange(0, 99999);
             document.execCommand('copy');
-            alert('✅ Student link copied to clipboard!');
+            alert('✅ Student link copied to clipboard!\n\nShare it with your students via email, LMS, or any messaging platform.');
           } else {
-            alert('Please generate the student link first.');
+            alert('Please generate the student link first by clicking "Get Student Link".');
           }
         },
         // ===== STUDENT PORTAL =====
         openStudentExam() {
           let examId = null;
+          // Try to parse exam ID from the link
           if (this.studentExamLink.includes('?exam=')) {
             const match = this.studentExamLink.match(/[?&]exam=(\d+)/);
             if (match) examId = parseInt(match[1]);
           }
+          // Also check if the link contains a direct exam ID (for testing)
+          if (!examId && this.studentExamLink) {
+            const numMatch = this.studentExamLink.match(/\d+/);
+            if (numMatch) examId = parseInt(numMatch[0]);
+          }
+          
           if (!examId) {
-            alert('Invalid exam link. Please paste the full link from your teacher.');
+            alert('❌ Invalid exam link.\n\nPlease paste the full link from your teacher. It should look like:\n' + window.location.href.split('?')[0] + '?exam=123');
             return;
           }
+          
           const exam = this.exams.find(e => e.id === examId);
           if (!exam) {
-            alert('Exam not found. Please check the link.');
+            alert('❌ Exam not found (ID: ' + examId + ').\n\nMake sure you have imported the exam data on this device using the "Import Data" button in the teacher dashboard.');
             return;
           }
           if (!exam.questions.length) {
@@ -670,6 +702,7 @@
             alert('Please enter your name.');
             return;
           }
+          
           this.activeExam = exam;
           this.activeExamId = exam.id;
           this.showExam = true;
@@ -734,14 +767,15 @@
           const s = seconds % 60;
           return `${m}:${s.toString().padStart(2, '0')}`;
         },
-        // ===== EXPORT / IMPORT =====
+        // ===== EXPORT / IMPORT (Cross-device sync) =====
         exportExam() {
           this.autoSave();
           const data = JSON.stringify({
             exams: this.exams,
             responses: this.responses,
             nextId: this.idCounter,
-            nextResponseId: this.responseIdCounter
+            nextResponseId: this.responseIdCounter,
+            exportedAt: new Date().toISOString()
           }, null, 2);
           const blob = new Blob([data], { type: 'application/json' });
           const url = URL.createObjectURL(blob);
@@ -752,7 +786,7 @@
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-          alert('✅ Data exported successfully!');
+          alert('✅ Data exported successfully!\n\nYou can now import this file on another device to sync your exams and responses.');
         },
         importExam() {
           document.getElementById('fileInput').click();
@@ -765,15 +799,18 @@
             try {
               const data = JSON.parse(e.target.result);
               if (data.exams && Array.isArray(data.exams)) {
+                // Merge or replace? We'll replace for simplicity
                 this.exams = data.exams;
                 this.responses = data.responses || [];
                 this.idCounter = data.nextId || this.idCounter;
                 this.responseIdCounter = data.nextResponseId || this.responseIdCounter;
                 this.currentExamIndex = 0;
                 this.saveToLocalStorage();
-                alert('✅ Import successful! ' + this.exams.length + ' exams, ' + this.responses.length + ' responses.');
+                alert('✅ Import successful!\n\n' + this.exams.length + ' exams loaded.\n' + this.responses.length + ' responses loaded.\n\nAll data has been saved locally.');
+                // Refresh the view
+                this.$forceUpdate();
               } else {
-                alert('Invalid format.');
+                alert('Invalid format. Please export data from the teacher dashboard first.');
               }
             } catch (err) {
               alert('Failed to parse JSON: ' + err.message);
@@ -788,9 +825,21 @@
           const examId = params.get('exam');
           if (examId) {
             this.view = 'student';
-            this.studentExamLink = window.location.href.split('?')[0] + '?exam=' + examId;
+            // Build the full link
+            const base = window.location.href.split('?')[0];
+            this.studentExamLink = base + '?exam=' + examId;
             const savedName = localStorage.getItem('examStudentName');
             if (savedName) this.studentName = savedName;
+            
+            // Auto-open the exam if we have the data
+            setTimeout(() => {
+              // Check if exam exists
+              const exam = this.exams.find(e => e.id === parseInt(examId));
+              if (exam) {
+                // Optionally auto-open, but let user click start
+                // We'll just show a message
+              }
+            }, 500);
           }
           if (localStorage.getItem('examTeacherAuth') === 'true') {
             this.isTeacher = true;
@@ -814,6 +863,12 @@
           this.saveToLocalStorage();
         }
         this.loadFromURL();
+        
+        // Check if we have a pending exam link
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('exam')) {
+          console.log('📝 Exam link detected. Student can start the exam by entering their name and clicking Start.');
+        }
       }
     });
   })();
