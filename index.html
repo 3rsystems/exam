@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Exam System · Live Responses + Management</title>
+    <title>Cloud Exam System · Live Responses</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
@@ -39,8 +39,6 @@
         .btn-purple:hover { background: #6d28d9; }
         .btn-teal { background: #0d9488; border-color: #0d9488; color: white; }
         .btn-teal:hover { background: #0f766e; }
-        .btn-pink { background: #db2777; border-color: #db2777; color: white; }
-        .btn-pink:hover { background: #be185d; }
 
         .view-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
         .view-tab {
@@ -99,6 +97,7 @@
         }
         .save-indicator.saved { background: #e6f4ea; color: #0f7b3a; }
         .save-indicator.saving { background: #fef7e0; color: #e37400; }
+        .save-indicator.cloud { background: #e8f0fe; color: #0b57d0; }
 
         .question-card {
             background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
@@ -194,7 +193,16 @@
         .toast i { margin-right: 8px; }
         .toast.success { border-left: 4px solid #0f7b3a; }
         .toast.info { border-left: 4px solid #0b57d0; }
+        .toast.error { border-left: 4px solid #d93025; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .cloud-status {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0.3rem 1rem; border-radius: 30px; font-size: 0.8rem; font-weight: 500;
+            background: #e8f0fe; color: #0b57d0;
+        }
+        .cloud-status.connected { background: #e6f4ea; color: #0f7b3a; }
+        .cloud-status.error { background: #fce8e6; color: #d93025; }
 
         @media (max-width: 600px) {
             .header { flex-direction: column; align-items: stretch; }
@@ -213,13 +221,10 @@
     <div class="app" id="app">
         <!-- Header -->
         <div class="header">
-            <h1><i class="fas fa-graduation-cap"></i> Exam System</h1>
+            <h1><i class="fas fa-cloud"></i> Cloud Exam System</h1>
             <div class="header-actions">
-                <span class="save-indicator" :class="saveStatus">
-                    <i class="fas" :class="saveIcon"></i> {{ saveText }}
-                </span>
-                <span class="live-indicator" :class="{ active: liveResponses }">
-                    <i class="fas fa-bolt"></i> {{ liveResponses ? 'Live' : 'Connected' }}
+                <span class="cloud-status" :class="cloudStatus">
+                    <i class="fas" :class="cloudIcon"></i> {{ cloudText }}
                 </span>
                 <button class="btn btn-outline btn-sm" @click="logoutTeacher" v-if="isTeacher"><i class="fas fa-sign-out-alt"></i> Logout</button>
                 <button class="btn btn-gold btn-sm" @click="showPasscode = true" v-if="!isTeacher"><i class="fas fa-lock"></i> Teacher Login</button>
@@ -255,7 +260,7 @@
         <div v-if="view === 'student'" class="student-portal">
             <i class="fas fa-users"></i>
             <h3>Student Portal</h3>
-            <p>Enter your name and paste the exam link shared by your teacher, or browse available exams below.</p>
+            <p>Enter your name and paste the exam link shared by your teacher to start.</p>
             <div class="form-group">
                 <input v-model="studentName" placeholder="Your full name" />
                 <input v-model="studentExamLink" placeholder="Paste exam link here" />
@@ -279,13 +284,18 @@
 
         <!-- Teacher View -->
         <div v-if="view === 'teacher' && isTeacher">
+            <div style="display:flex; gap:1rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap;">
+                <button class="btn btn-primary" @click="syncFromCloud"><i class="fas fa-cloud-download-alt"></i> Sync from Cloud</button>
+                <button class="btn btn-success" @click="syncToCloud"><i class="fas fa-cloud-upload-alt"></i> Sync to Cloud</button>
+                <span style="font-size:0.8rem; color:#5f6368;">Last sync: {{ lastSync || 'Never' }}</span>
+            </div>
+
             <!-- Exam tabs -->
             <div class="exam-tabs">
                 <div v-for="(exam, ei) in exams" :key="ei" class="exam-tab" :class="{ active: currentExamIndex === ei }" @click="switchExam(ei)">
                     <i class="fas fa-file-alt"></i> {{ exam.name || 'Exam '+(ei+1) }}
                     <span class="badge">{{ exam.questions.length }}</span>
-                    <span class="publish-status" :class="exam.published ? 'published' : 'unpublished'" style="font-size:0.6rem; padding:0.1rem 0.6rem; border-radius:30px; background:#e6f4ea; color:#0f7b3a;" v-if="exam.published">🌐 Published</span>
-                    <span class="publish-status" :class="exam.published ? 'published' : 'unpublished'" style="font-size:0.6rem; padding:0.1rem 0.6rem; border-radius:30px; background:#fef7e0; color:#e37400;" v-else>🔒 Draft</span>
+                    <span style="font-size:0.6rem; padding:0.1rem 0.6rem; border-radius:30px; background:#e6f4ea; color:#0f7b3a;" v-if="exam.published">🌐</span>
                 </div>
                 <button class="btn btn-outline btn-sm add-exam-btn" @click="addExam"><i class="fas fa-plus"></i> New Exam</button>
                 <button class="btn btn-danger btn-sm" @click="deleteCurrentExam" v-if="exams.length > 1"><i class="fas fa-trash"></i> Delete</button>
@@ -293,14 +303,13 @@
 
             <!-- Exam name + timer -->
             <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap;">
-                <input v-model="currentExam.name" placeholder="Exam title ..." style="flex:1; padding:0.5rem 1rem; border:1px solid #dadce0; border-radius:30px; background:white; font-weight:500;" @input="autoSave" />
+                <input v-model="currentExam.name" placeholder="Exam title ..." style="flex:1; padding:0.5rem 1rem; border:1px solid #dadce0; border-radius:30px; background:white; font-weight:500;" />
                 <button class="btn btn-teal" @click="publishExam"><i class="fas fa-globe"></i> {{ currentExam.published ? 'Unpublish' : 'Publish' }}</button>
                 <button class="btn btn-success" @click="generateStudentLink"><i class="fas fa-link"></i> Get Link</button>
-                <button class="btn btn-purple" @click="manualSave"><i class="fas fa-save"></i> Save</button>
             </div>
             <div class="timer-row">
                 <label><i class="fas fa-hourglass-half"></i> Timer (minutes)</label>
-                <input type="number" v-model.number="currentExam.timerMinutes" min="1" max="999" placeholder="min" @input="autoSave" />
+                <input type="number" v-model.number="currentExam.timerMinutes" min="1" max="999" placeholder="min" />
                 <span style="font-size:0.85rem; color:#5f6368; margin-left:auto;">
                     <i class="fas fa-info-circle"></i> Timer starts when student opens exam
                 </span>
@@ -321,11 +330,11 @@
                     <option value="truefalse">True / False</option>
                     <option value="short">Short answer</option>
                 </select>
-                <input class="question-input" v-model="q.text" placeholder="Enter question text ..." @input="autoSave" />
+                <input class="question-input" v-model="q.text" placeholder="Enter question text ..." />
                 <div class="options-group" v-if="['multiple','checkbox','truefalse'].includes(q.type)">
                     <div v-for="(opt, oi) in q.options" :key="oi" class="option-row">
                         <span class="radio-label"><i class="far fa-circle"></i></span>
-                        <input type="text" v-model="q.options[oi]" placeholder="Option text" @input="autoSave" />
+                        <input type="text" v-model="q.options[oi]" placeholder="Option text" />
                         <span class="correct-badge" v-if="isCorrect(q, oi)"><i class="fas fa-check-circle"></i> Correct</span>
                         <button class="remove-btn" @click="removeOption(index, oi)" v-if="q.options.length > 2"><i class="fas fa-minus-circle"></i></button>
                     </div>
@@ -333,16 +342,16 @@
                         <button class="add-option-btn" @click="addOption(index)"><i class="fas fa-plus-circle"></i> Add option</button>
                         <div style="display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap;">
                             <span style="font-size:0.8rem; color:#3c4043;"><i class="fas fa-flag-checkered"></i> Correct:</span>
-                            <select v-if="q.type === 'multiple'" v-model="q.correctIndex" style="padding:0.3rem 0.6rem; border-radius:20px; border:1px solid #dadce0;" @change="autoSave">
+                            <select v-if="q.type === 'multiple'" v-model="q.correctIndex" style="padding:0.3rem 0.6rem; border-radius:20px; border:1px solid #dadce0;">
                                 <option v-for="(opt, oi) in q.options" :key="oi" :value="oi">Option {{ oi+1 }}</option>
                             </select>
                             <div v-if="q.type === 'checkbox'" style="display:flex; gap:0.4rem; flex-wrap:wrap;">
                                 <span v-for="(opt, oi) in q.options" :key="oi" style="display:flex; align-items:center; gap:4px; font-size:0.8rem;">
-                                    <input type="checkbox" :value="oi" v-model="q.correctIndexes" @change="autoSave" /> {{ oi+1 }}
+                                    <input type="checkbox" :value="oi" v-model="q.correctIndexes" /> {{ oi+1 }}
                                 </span>
                             </div>
                             <span v-if="q.type === 'truefalse'" style="font-size:0.9rem;">
-                                <select v-model="q.correctIndex" style="padding:0.2rem 0.8rem; border-radius:20px; border:1px solid #dadce0;" @change="autoSave">
+                                <select v-model="q.correctIndex" style="padding:0.2rem 0.8rem; border-radius:20px; border:1px solid #dadce0;">
                                     <option v-for="(opt, oi) in q.options" :key="oi" :value="oi">{{ opt }}</option>
                                 </select>
                             </span>
@@ -350,7 +359,7 @@
                     </div>
                 </div>
                 <div v-if="q.type === 'short'" style="margin-top:0.5rem;">
-                    <input class="question-input" v-model="q.correctAnswer" placeholder="Correct answer (optional)" style="margin:0;" @input="autoSave" />
+                    <input class="question-input" v-model="q.correctAnswer" placeholder="Correct answer (optional)" style="margin:0;" />
                     <span style="font-size:0.8rem; color:#5f6368;"><i class="fas fa-info-circle"></i> Leave blank for free text</span>
                 </div>
             </div>
@@ -413,13 +422,6 @@
                     </tbody>
                 </table>
             </div>
-
-            <!-- Export/Import -->
-            <div style="display:flex; gap:1rem; margin-top:1.5rem; flex-wrap:wrap; justify-content:flex-end;">
-                <button class="btn btn-success" @click="exportExam"><i class="fas fa-download"></i> Export All</button>
-                <button class="btn btn-outline" @click="importExam"><i class="fas fa-upload"></i> Import All</button>
-                <input type="file" id="fileInput" accept=".json" style="display:none" @change="handleImport" />
-            </div>
         </div>
 
         <!-- Exam Overlay -->
@@ -461,7 +463,7 @@
             </div>
         </div>
 
-        <!-- Toast Notification -->
+        <!-- Toast -->
         <div class="toast" v-if="toastMessage" :class="toastType">
             <i class="fas" :class="toastIcon"></i> {{ toastMessage }}
         </div>
@@ -471,6 +473,16 @@
     </script>
     <script>
         (function() {
+            // ===== CLOUD CONFIGURATION =====
+            // You need to create a free JSONBin account and get your API key
+            // https://jsonbin.io/
+            const CLOUD_CONFIG = {
+                // Replace these with your actual JSONBin credentials
+                API_KEY: '$2a$10$hYQkR6BvH5w2rJ8kLmNpXeFgHjKlMnOpQrStUvWxYzAbCdEfGhIjK',
+                BIN_ID: '67d8f9d98a456b79667f3a4e',
+                BASE_URL: 'https://api.jsonbin.io/v3/b/'
+            };
+
             const app = new Vue({
                 el: '#app',
                 data: {
@@ -495,12 +507,13 @@
                     studentAnswers: {},
                     studentCheckboxAnswers: {},
                     studentShortAnswers: {},
-                    saveStatus: 'saved',
-                    saveTimeout: null,
-                    liveResponses: false,
                     toastMessage: '',
                     toastType: 'success',
-                    toastTimer: null
+                    toastTimer: null,
+                    cloudStatus: 'connecting',
+                    cloudText: 'Connecting...',
+                    lastSync: null,
+                    syncTimeout: null
                 },
                 computed: {
                     currentExam() {
@@ -515,18 +528,14 @@
                         const base = window.location.href.split('?')[0];
                         return `${base}?exam=${this.currentExam.id}`;
                     },
-                    saveText() {
-                        if (this.saveStatus === 'saved') return 'Saved';
-                        if (this.saveStatus === 'saving') return 'Saving...';
-                        return 'Auto-save';
-                    },
-                    saveIcon() {
-                        if (this.saveStatus === 'saved') return 'fa-check-circle';
-                        if (this.saveStatus === 'saving') return 'fa-spinner fa-spin';
-                        return 'fa-save';
-                    },
                     toastIcon() {
-                        return this.toastType === 'success' ? 'fa-check-circle' : 'fa-info-circle';
+                        return this.toastType === 'success' ? 'fa-check-circle' : this.toastType === 'error' ?
+                            'fa-exclamation-circle' : 'fa-info-circle';
+                    },
+                    cloudIcon() {
+                        if (this.cloudStatus === 'connected') return 'fa-check-circle';
+                        if (this.cloudStatus === 'error') return 'fa-exclamation-circle';
+                        return 'fa-spinner fa-spin';
                     }
                 },
                 methods: {
@@ -539,52 +548,87 @@
                             this.toastMessage = '';
                         }, 5000);
                     },
-                    // ===== SAVE SYSTEM =====
-                    autoSave() {
-                        this.saveStatus = 'saving';
-                        clearTimeout(this.saveTimeout);
-                        this.saveTimeout = setTimeout(() => {
-                            this.saveToLocalStorage();
-                        }, 800);
-                    },
-                    manualSave() {
-                        this.saveToLocalStorage();
-                        this.saveStatus = 'saved';
-                        this.showToast('✅ Data saved successfully!', 'success');
-                        setTimeout(() => {
-                            this.saveStatus = 'saved';
-                        }, 2000);
-                    },
-                    saveToLocalStorage() {
+                    // ===== CLOUD SYNC =====
+                    async syncToCloud() {
                         try {
+                            this.cloudStatus = 'connecting';
+                            this.cloudText = 'Uploading...';
                             const data = {
                                 exams: this.exams,
                                 responses: this.responses,
                                 nextId: this.idCounter,
-                                nextResponseId: this.responseIdCounter
+                                nextResponseId: this.responseIdCounter,
+                                timestamp: new Date().toISOString()
                             };
-                            localStorage.setItem('examSystemData', JSON.stringify(data));
-                            this.saveStatus = 'saved';
-                        } catch (e) {
-                            console.error('Save failed:', e);
-                            this.saveStatus = 'saved';
-                        }
-                    },
-                    loadFromLocalStorage() {
-                        try {
-                            const saved = localStorage.getItem('examSystemData');
-                            if (saved) {
-                                const data = JSON.parse(saved);
-                                this.exams = data.exams || [];
-                                this.responses = data.responses || [];
-                                this.idCounter = data.nextId || 0;
-                                this.responseIdCounter = data.nextResponseId || 0;
-                                return true;
+                            const response = await fetch(CLOUD_CONFIG.BASE_URL + CLOUD_CONFIG.BIN_ID, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-Master-Key': CLOUD_CONFIG.API_KEY
+                                },
+                                body: JSON.stringify(data)
+                            });
+                            if (response.ok) {
+                                this.cloudStatus = 'connected';
+                                this.cloudText = 'Cloud Connected';
+                                this.lastSync = new Date().toLocaleString();
+                                this.showToast('✅ Data synced to cloud!', 'success');
+                            } else {
+                                throw new Error('Upload failed');
                             }
                         } catch (e) {
-                            console.error('Load failed:', e);
+                            console.error('Sync to cloud error:', e);
+                            this.cloudStatus = 'error';
+                            this.cloudText = 'Sync Error';
+                            this.showToast('❌ Failed to sync to cloud. Check API key.', 'error');
                         }
-                        return false;
+                    },
+                    async syncFromCloud() {
+                        try {
+                            this.cloudStatus = 'connecting';
+                            this.cloudText = 'Downloading...';
+                            const response = await fetch(CLOUD_CONFIG.BASE_URL + CLOUD_CONFIG.BIN_ID + '/latest', {
+                                headers: {
+                                    'X-Master-Key': CLOUD_CONFIG.API_KEY
+                                }
+                            });
+                            if (response.ok) {
+                                const result = await response.json();
+                                const data = result.record;
+                                if (data && data.exams) {
+                                    this.exams = data.exams || [];
+                                    this.responses = data.responses || [];
+                                    this.idCounter = data.nextId || 0;
+                                    this.responseIdCounter = data.nextResponseId || 0;
+                                    this.currentExamIndex = 0;
+                                    this.cloudStatus = 'connected';
+                                    this.cloudText = 'Cloud Connected';
+                                    this.lastSync = new Date().toLocaleString();
+                                    this.showToast('✅ Data synced from cloud! ' + this.exams.length + ' exams loaded',
+                                        'success');
+                                    this.$forceUpdate();
+                                } else {
+                                    throw new Error('Invalid data format');
+                                }
+                            } else {
+                                throw new Error('Download failed');
+                            }
+                        } catch (e) {
+                            console.error('Sync from cloud error:', e);
+                            this.cloudStatus = 'error';
+                            this.cloudText = 'Sync Error';
+                            this.showToast('❌ Failed to sync from cloud. Check your connection.', 'error');
+                        }
+                    },
+                    // ===== AUTO SYNC =====
+                    autoSyncToCloud() {
+                        // Auto-sync after changes (debounced)
+                        if (this.syncTimeout) clearTimeout(this.syncTimeout);
+                        this.syncTimeout = setTimeout(() => {
+                            if (this.isTeacher) {
+                                this.syncToCloud();
+                            }
+                        }, 3000);
                     },
                     // ===== PASSCODE =====
                     verifyPasscode() {
@@ -595,8 +639,9 @@
                             this.passcodeInput = '';
                             this.passcodeError = '';
                             localStorage.setItem('examTeacherAuth', 'true');
-                            this.autoSave();
                             this.showToast('🔓 Welcome Teacher!', 'success');
+                            // Auto-sync from cloud
+                            this.syncFromCloud();
                         } else {
                             this.passcodeError = '❌ Incorrect passcode. Try again.';
                             this.passcodeInput = '';
@@ -605,6 +650,7 @@
                     switchToTeacher() {
                         if (this.isTeacher) {
                             this.view = 'teacher';
+                            this.syncFromCloud();
                         } else {
                             this.showPasscode = true;
                         }
@@ -613,7 +659,6 @@
                         this.isTeacher = false;
                         this.view = 'student';
                         localStorage.removeItem('examTeacherAuth');
-                        this.autoSave();
                         this.showToast('👋 Logged out', 'info');
                     },
                     // ===== EXAM MANAGEMENT =====
@@ -627,8 +672,8 @@
                             published: false
                         });
                         this.currentExamIndex = this.exams.length - 1;
-                        this.autoSave();
                         this.showToast('📝 New exam created!', 'success');
+                        this.autoSyncToCloud();
                     },
                     deleteCurrentExam() {
                         if (this.exams.length <= 1) {
@@ -638,11 +683,10 @@
                         if (confirm('Delete "' + this.currentExam.name + '" and all its responses?')) {
                             const examId = this.currentExam.id;
                             this.exams.splice(this.currentExamIndex, 1);
-                            // Remove responses for this exam
                             this.responses = this.responses.filter(r => r.examId !== examId);
                             if (this.currentExamIndex >= this.exams.length) this.currentExamIndex = this.exams.length - 1;
-                            this.autoSave();
                             this.showToast('🗑️ Exam deleted', 'success');
+                            this.autoSyncToCloud();
                         }
                     },
                     switchExam(index) {
@@ -659,12 +703,12 @@
                             correctAnswer: ''
                         };
                         this.currentExam.questions.push(q);
-                        this.autoSave();
+                        this.autoSyncToCloud();
                     },
                     removeQuestion(index) {
                         if (confirm('Remove this question?')) {
                             this.currentExam.questions.splice(index, 1);
-                            this.autoSave();
+                            this.autoSyncToCloud();
                         }
                     },
                     duplicateQuestion(index) {
@@ -679,12 +723,12 @@
                             correctAnswer: q.correctAnswer || ''
                         };
                         this.currentExam.questions.splice(index + 1, 0, newQ);
-                        this.autoSave();
                         this.showToast('📋 Question duplicated', 'success');
+                        this.autoSyncToCloud();
                     },
                     addOption(index) {
                         this.currentExam.questions[index].options.push('');
-                        this.autoSave();
+                        this.autoSyncToCloud();
                     },
                     removeOption(qIndex, oIndex) {
                         const q = this.currentExam.questions[qIndex];
@@ -694,7 +738,7 @@
                         if (q.correctIndexes) {
                             q.correctIndexes = q.correctIndexes.filter(i => i < q.options.length);
                         }
-                        this.autoSave();
+                        this.autoSyncToCloud();
                     },
                     onTypeChange(q) {
                         if (q.type === 'truefalse') {
@@ -708,7 +752,7 @@
                             if (!q.options || q.options.length < 2) q.options = ['', ''];
                             q.correctIndex = 0;
                         }
-                        this.autoSave();
+                        this.autoSyncToCloud();
                     },
                     isCorrect(q, oi) {
                         if (q.type === 'checkbox') {
@@ -723,9 +767,9 @@
                             return;
                         }
                         this.currentExam.published = !this.currentExam.published;
-                        this.autoSave();
                         const status = this.currentExam.published ? 'published' : 'unpublished';
                         this.showToast(`✅ Exam ${status}!`, 'success');
+                        this.autoSyncToCloud();
                     },
                     // ===== RESPONSES =====
                     getResponsesForExam(examId) {
@@ -737,8 +781,8 @@
                         if (count === 0) return;
                         if (confirm(`Delete all ${count} responses for "${this.currentExam.name}"?`)) {
                             this.responses = this.responses.filter(r => r.examId !== examId);
-                            this.autoSave();
                             this.showToast(`🧹 ${count} responses cleared`, 'success');
+                            this.autoSyncToCloud();
                         }
                     },
                     // ===== STUDENT LINK =====
@@ -747,9 +791,10 @@
                             this.showToast('❌ Add at least one question first', 'info');
                             return;
                         }
-                        this.autoSave();
+                        // Sync to cloud so the link works on other devices
+                        this.syncToCloud();
                         this.$forceUpdate();
-                        this.showToast('✅ Link generated! Copy and share it.', 'success');
+                        this.showToast('✅ Link generated! Share it with your students.', 'success');
                     },
                     copyStudentLink() {
                         const input = document.getElementById('studentLinkInput');
@@ -767,7 +812,7 @@
                         this.studentExamLink = window.location.href.split('?')[0] + '?exam=' + exam.id;
                         this.openStudentExam();
                     },
-                    openStudentExam() {
+                    async openStudentExam() {
                         let examId = null;
                         if (this.studentExamLink.includes('?exam=')) {
                             const match = this.studentExamLink.match(/[?&]exam=(\d+)/);
@@ -783,9 +828,17 @@
                             return;
                         }
 
+                        // First, try to sync from cloud to get latest data
+                        try {
+                            await this.syncFromCloud();
+                        } catch (e) {
+                            // If sync fails, use local data
+                            console.log('Using local data');
+                        }
+
                         const exam = this.exams.find(e => e.id === examId);
                         if (!exam) {
-                            this.showToast('❌ Exam not found', 'info');
+                            this.showToast('❌ Exam not found. Ask your teacher to publish it.', 'error');
                             return;
                         }
                         if (!exam.questions.length) {
@@ -828,7 +881,7 @@
                         }
                         document.body.style.overflow = '';
                     },
-                    submitStudentExam() {
+                    async submitStudentExam() {
                         if (this.examTimedOut) {
                             this.showToast('⏰ Time is up!', 'info');
                             return;
@@ -851,13 +904,13 @@
                             timestamp: new Date().toLocaleString()
                         };
                         this.responses.push(response);
-                        this.autoSave();
+
+                        // Sync to cloud immediately so teacher sees it
+                        await this.syncToCloud();
+
                         this.showToast('✅ Exam submitted! Thank you, ' + this.studentName, 'success');
                         this.closeExam();
                         this.view = 'student';
-                        // Simulate live response notification
-                        this.liveResponses = true;
-                        setTimeout(() => { this.liveResponses = false; }, 3000);
                     },
                     formatTime(seconds) {
                         if (seconds < 0) seconds = 0;
@@ -865,58 +918,7 @@
                         const s = seconds % 60;
                         return `${m}:${s.toString().padStart(2, '0')}`;
                     },
-                    // ===== EXPORT / IMPORT =====
-                    exportExam() {
-                        this.autoSave();
-                        const data = JSON.stringify({
-                            exams: this.exams,
-                            responses: this.responses,
-                            nextId: this.idCounter,
-                            nextResponseId: this.responseIdCounter,
-                            exportedAt: new Date().toISOString()
-                        }, null, 2);
-                        const blob = new Blob([data], { type: 'application/json' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'exam_system_data.json';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        this.showToast('✅ Data exported successfully!', 'success');
-                    },
-                    importExam() {
-                        document.getElementById('fileInput').click();
-                    },
-                    handleImport(event) {
-                        const file = event.target.files[0];
-                        if (!file) return;
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            try {
-                                const data = JSON.parse(e.target.result);
-                                if (data.exams && Array.isArray(data.exams)) {
-                                    this.exams = data.exams;
-                                    this.responses = data.responses || [];
-                                    this.idCounter = data.nextId || this.idCounter;
-                                    this.responseIdCounter = data.nextResponseId || this.responseIdCounter;
-                                    this.currentExamIndex = 0;
-                                    this.saveToLocalStorage();
-                                    this.showToast('✅ Import successful! ' + this.exams.length + ' exams loaded',
-                                        'success');
-                                    this.$forceUpdate();
-                                } else {
-                                    this.showToast('❌ Invalid format', 'info');
-                                }
-                            } catch (err) {
-                                this.showToast('❌ Failed to parse JSON', 'info');
-                            }
-                        };
-                        reader.readAsText(file);
-                        event.target.value = '';
-                    },
-                    // ===== AUTO-LOAD FROM URL =====
+                    // ===== LOAD FROM URL =====
                     loadFromURL() {
                         const params = new URLSearchParams(window.location.search);
                         const examId = params.get('exam');
@@ -926,6 +928,16 @@
                             this.studentExamLink = base + '?exam=' + examId;
                             const savedName = localStorage.getItem('examStudentName');
                             if (savedName) this.studentName = savedName;
+                            // Auto-try to sync from cloud
+                            setTimeout(() => {
+                                this.syncFromCloud().then(() => {
+                                    // Check if exam exists after sync
+                                    const exam = this.exams.find(e => e.id === parseInt(examId));
+                                    if (exam && exam.published) {
+                                        // Student can now take the exam
+                                    }
+                                }).catch(() => {});
+                            }, 500);
                         }
                         if (localStorage.getItem('examTeacherAuth') === 'true') {
                             this.isTeacher = true;
@@ -938,15 +950,12 @@
                     }
                 },
                 mounted() {
-                    const hasData = this.loadFromLocalStorage();
-                    if (!hasData) {
-                        this.exams = [];
-                        this.responses = [];
-                        this.idCounter = 0;
-                        this.responseIdCounter = 0;
-                        this.saveToLocalStorage();
-                    }
                     this.loadFromURL();
+                    // Try to connect to cloud
+                    this.syncFromCloud().catch(() => {
+                        this.cloudStatus = 'error';
+                        this.cloudText = 'Cloud Offline';
+                    });
                 }
             });
         })();
